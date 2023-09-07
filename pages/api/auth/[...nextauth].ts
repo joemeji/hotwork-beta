@@ -10,7 +10,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        const res = await fetch("http://localhost:8080/auth/jwt", {
+        const res = await fetch("https://api.hotwork.ag/auth/jwt", {
           method: 'POST',
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" }
