@@ -1,3 +1,4 @@
+import { baseUrl } from "@/utils/api.config";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -10,7 +11,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        const res = await fetch("https://api.hotwork.ag/auth/jwt", {
+        const res = await fetch(baseUrl + "/auth/jwt", {
           method: 'POST',
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" }
