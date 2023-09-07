@@ -52,11 +52,11 @@ export async function appClientFetch({
   return res;
 }
 
-export const fetchApi = async ([url, token]) => {
+export const fetchApi = async ([url, token]: any) => {
   const res = await fetch(baseUrl + url, { headers: { Authorization: 'Bearer ' + token } });
 
   if (!res.ok) {
-    const error = new Error('An error occurred while fetching the data.')
+    const error: any = new Error('An error occurred while fetching the data.')
     // Attach extra info to the error object.
     error.info = await res.json()
     error.status = res.status

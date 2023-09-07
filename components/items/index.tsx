@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { BadgePlus, ChevronRight, FileDown, FileText, MoreHorizontal, Printer, QrCode, X } from "lucide-react";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { truncate } from "@/utils/text";
 import { BreakPointContext } from "@/context/layout-context";
@@ -287,19 +287,19 @@ const CategoryList = ({ categoryId, _item_category_id, item_category_name, sub_c
   const [openSub, setOpenSub] = useState(false);
   const [ulHeight, setUlHeight] = useState(0);
 
-  const onShowSubCategories = () => {
+  const onShowSubCategories = useCallback(() => {
     let liHeights = 0;
-    if (sub_categories && Array.isArray(sub_categories)) {
-      sub_categories.forEach((li: any) => {
-        const liElem = li.listRef.current;
-        if (liElem) {
-          const { height } = liElem.getBoundingClientRect();
-          liHeights += height;
-        }
-      });
-    }
-    setUlHeight(liHeights);
-  };
+      if (sub_categories && Array.isArray(sub_categories)) {
+        sub_categories.forEach((li: any) => {
+          const liElem = li.listRef.current;
+          if (liElem) {
+            const { height } = liElem.getBoundingClientRect();
+            liHeights += height;
+          }
+        });
+      }
+      setUlHeight(liHeights);
+  }, [sub_categories]);
 
   useEffect(() => {
     const sub_category = Array.isArray(sub_categories) ? sub_categories.find((sub: any) => sub.item_sub_category_id === sub_category_id) : null;
@@ -309,7 +309,7 @@ const CategoryList = ({ categoryId, _item_category_id, item_category_name, sub_c
     } else {
       setOpenSub(false)
     }
-  }, [sub_categories, categoryId, _item_category_id]);
+  }, [sub_categories, categoryId, _item_category_id, sub_category_id, onShowSubCategories]);
 
   useEffect(() => {
     if (_sub_categories) {
