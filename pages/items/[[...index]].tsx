@@ -62,7 +62,10 @@ const ItemsData = (props: ItemsDataType) => {
         Authorization: 'Bearer ' + access_token
       }
     })
-    .then(res => res.json())
+    .then(res => {
+      console.log(res.status)
+      return res.json();
+    })
     .then(data => console.log({ data }))
   }, [access_token]);
 
