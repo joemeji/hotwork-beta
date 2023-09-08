@@ -56,6 +56,16 @@ const ItemsData = (props: ItemsDataType) => {
     }
   );
 
+  useEffect(() => {
+    fetch(baseUrl + '/api/items/category', {
+      headers: {
+        Authorization: 'Bearer ' + access_token
+      }
+    })
+    .then(res => res.json())
+    .then(data => console.log({ data }))
+  }, [access_token]);
+
   if (typeof window !== 'undefined') {
     document.title = 'Items | ' + getSingleCategory();
   }
