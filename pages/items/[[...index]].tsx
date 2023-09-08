@@ -59,8 +59,9 @@ const ItemsData = (props: ItemsDataType) => {
   useEffect(() => {
     fetch(baseUrl + '/api/items/category', {
       headers: {
-        Authorization: 'Bearer ' + access_token
-      }
+        Authorization: 'Bearer ' + access_token,
+        credentials: 'include'
+      },
     })
     .then(res => {
       console.log(res.status)
