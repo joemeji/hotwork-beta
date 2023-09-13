@@ -48,27 +48,13 @@ const ItemsData = (props: ItemsDataType) => {
   let searchParams = new URLSearchParams(paramsObj);
 
   const { data, isLoading, error } = useSWR(
-    [`/api/items/category/${(categoryId || '')}?${searchParams.toString()}`, access_token], 
+    [`/api/items/category${(categoryId ? '/' + categoryId : '')}?${searchParams.toString()}`, access_token], 
     fetchApi,
     {
       revalidateOnFocus: false,
       revalidateIfStale: false,
     }
   );
-
-  useEffect(() => {
-    fetch(baseUrl + '/api/items/category', {
-      headers: {
-        Authorization: 'Bearer ' + access_token,
-        credentials: 'include'
-      },
-    })
-    .then(res => {
-      console.log(res.status)
-      return res.json();
-    })
-    .then(data => console.log({ data }))
-  }, [access_token]);
 
   if (typeof window !== 'undefined') {
     document.title = 'Items | ' + getSingleCategory();
