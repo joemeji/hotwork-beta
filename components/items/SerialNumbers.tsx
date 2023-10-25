@@ -1,14 +1,13 @@
 import { cn } from "@/lib/utils";
 import { authHeaders, baseUrl, fetchApi } from "@/utils/api.config";
 import { generateQrCode, propertyOf } from "@/utils/itemQrCodeDraw";
-import { Bookmark, Bus, Check, Circle, Loader2, Lock, MoreHorizontal, Recycle, Ship, Wrench, X } from "lucide-react";
+import { Bookmark, Bus, Check, Circle, Loader2, Lock, Recycle, Ship, Wrench, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { ActionButtonHeader, ItemMenu, QRCodeModal, SelectAll, TypePlateQRCodeModal, actionMenu, certificationActionButton, serialNumberAction } from ".";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import Pagination from "../pagination";
 import uniqid from "@/utils/text";
@@ -20,6 +19,8 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import onViewOnPDF from "@/utils/itemOnViewPDF";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
+import MoreOption from "../MoreOption";
+import Status from "../status/status";
 
 type SerialNumbersType = { 
   _item_id?: string, 
@@ -60,7 +61,7 @@ export default function SerialNumbers(props: SerialNumbersType) {
   );
 
   const TH = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-    <td className={cn('border-b py-3 px-2 text-sm border-stone-100 bg-stone-100 text-stone-600', className)}>{children}</td>
+    <td className={cn('border-b py-3 px-2 text-sm border-stone-200 font-medium bg-stone-200 text-stone-600', className)}>{children}</td>
   );
 
   const TD = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
@@ -333,7 +334,7 @@ export default function SerialNumbers(props: SerialNumbersType) {
           )}
           {data && data.serial_numbers && data.serial_numbers.map((sn: any, key: number) => (
             <tr key={key} className="group hover:bg-stone-100">
-              <TD className="font-medium ps-3">
+              <TD className="ps-3">
                 <div className="flex items-center">
                   <Checkbox 
                     className={cn(
@@ -343,11 +344,21 @@ export default function SerialNumbers(props: SerialNumbersType) {
                     onCheckedChange={(isChecked: any) => onSelectSingleItem(isChecked, sn._serial_number_id)}
                     checked={isCheckDataToSelect(sn._serial_number_id)}
                   />
-                  {sn.serial_number}
+                  <span className="font-bold">{sn.serial_number}</span>
                 </div>
               </TD>
               <TD>
-                {serialNumberStatus(sn.serial_number_status)}
+                <Status 
+                    statusName={sn.serial_number_status}
+                    className={cn(
+                      "flex gap-1 py-1 px-2 items-center rounded-md w-fit",
+                    )}
+                    statusClassName="text-sm font-medium"
+                    iconProps={{
+                      width: 15,
+                      height: 15,
+                    }}
+                  />
               </TD>
               <TD>{sn.warehouse_country}</TD>
               <TD>{sn.item_construction_year || '--'}</TD>
@@ -355,25 +366,18 @@ export default function SerialNumbers(props: SerialNumbersType) {
                 <TagButton _serial_number={sn} />
               </TD>
               <TD className="text-right pe-4">
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="p-1 text-stone-400 border-0 bg-transparent h-auto rounded-full">
-                      <MoreHorizontal className="w-5 h-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40 border border-stone-50">
-                    {[...actionMenu, ...serialNumberAction, ...certificationActionButton, ...additionalActionButton].map((action, key) => (
-                      <ItemMenu key={key}
-                        onClick={(e: any) => onClickAction(sn, action.actionType)}
-                      >
-                        {action.icon}
-                        <span className="text-stone-600 text-sm">
-                          {action.name}
-                        </span>
-                      </ItemMenu>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <MoreOption>
+                  {[...actionMenu, ...serialNumberAction, ...certificationActionButton, ...additionalActionButton].map((action, key) => (
+                    <ItemMenu key={key}
+                      onClick={(e: any) => onClickAction(sn, action.actionType)}
+                    >
+                      {action.icon}
+                      <span className="text-stone-600 font-medium">
+                        {action.name}
+                      </span>
+                    </ItemMenu>
+                  ))}
+                </MoreOption>
               </TD>
             </tr>
           ))}
@@ -390,59 +394,6 @@ export default function SerialNumbers(props: SerialNumbersType) {
     </>
   );
 }
-
-const serialNumberStatus = (status: string) => {
-  const _status = snStatuses.find(item => item.name == status);
-  const statusIcon = () => {
-    if (status === 'sold' || status === 'Sold') 
-      return (
-        <Lock 
-          className={cn( "w-4 h-4")} 
-          style={{ color: _status && _status.color }}
-        />
-      );
-    if (status === 'active')
-      return <Circle 
-        className={cn("w-3 h-3",)} 
-        style={{
-          color: _status && _status.color,
-          fill: _status && _status.color
-        }}
-      />
-    if (status === 'onset') 
-      return <Check 
-        className={cn("w-4 h-4")} 
-        strokeWidth={3}
-        style={{ color: _status && _status.color }}
-      />
-    if (status === 'onshipping') 
-      return <Ship 
-        className={cn( "w-4 h-4" )} 
-        style={{ color: _status && _status.color }}
-      />
-    if (status === 'ontransit') 
-      return <Bus 
-        className={cn( "w-4 h-4" )} 
-        style={{ color: _status && _status.color }}
-      />
-    if (status === 'onjunk') 
-      return <Recycle 
-        className={cn( "w-4 h-4" )} 
-        style={{ color: _status && _status.color }}
-      />
-
-    if (status === 'onmaintenance') 
-      return <Wrench 
-        className={cn( "w-4 h-4" )} 
-        style={{ color: _status && _status.color }}
-      />
-  }
-  return (
-    <div className="flex items-center gap-2 text-stone-500">
-      {statusIcon()} {_status ? _status.text : status}
-    </div>
-  );
-};
 
 interface ManageSnStatusModalType extends DialogProps {
   selectedSerialNumber?: any,
@@ -501,9 +452,17 @@ export const ManageSnStatusModal = (props: ManageSnStatusModalType) => {
           <span className="font-medium">
             {selectedSerialNumber && selectedSerialNumber.serial_number}
           </span>
-          <div className="bg-white px-3 py-1 rounded-full">
-            {serialNumberStatus(currentStatus)}
-          </div>
+            <Status 
+              statusName={currentStatus}
+              className={cn(
+                "flex gap-1 py-1 px-2 items-center rounded-md w-fit",
+              )}
+              statusClassName="text-sm font-medium"
+              iconProps={{
+                width: 15,
+                height: 15,
+              }}
+            />
         </div>
         <div className="p-3">
           <RadioGroup className="flex flex-wrap w-full gap-0"

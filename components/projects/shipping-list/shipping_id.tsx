@@ -1,31 +1,44 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import React from "react";
+import { fetchApi } from "@/utils/api.config";
+import { avatarFallback } from "@/utils/avatar";
+import dayjs from "dayjs";
+import { Check, X } from "lucide-react";
+import { Pencil } from "lucide-react";
+import { useRouter } from "next/router";
+import React, { memo } from "react";
+import useSWR from 'swr';
+
+const _ShippingDetails = (props: ShippingDetails) => {
+  const { children } = props;
+
+  return (
+    <div className="p-[20px] w-full max-w-[1600px] mx-auto">
+      <div className="flex gap-5">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export const ShippingDetails = memo(_ShippingDetails);
 
 type ShippingDetails = {
   children?: React.ReactNode
 }
 
-export const ShippingDetails = ({ children }: ShippingDetails) => {
+export const CompleteIncompleteStatus = ({ completed = false }: { completed: boolean }) => {
+  if (completed) {
+    return (
+      <div className="bg-green-400 p-[3px] w-fit rounded-full">
+        <Check width={16} height={16} strokeWidth={4} className="text-white" />
+      </div> 
+    );
+  }
   return (
-    <div className="p-[20px] w-full max-w-[1600px] mx-auto">
-      <div className="flex gap-5">
-        <ScrollArea 
-          className={cn(
-            "w-1/4 bg-white",
-            "rounded-xl shadow-sm p-4"
-          )}
-        >
-          <p className="text-2xl font-bold">9 Sets of Dry-Out Equipment(Sea Freight)</p>  
-        </ScrollArea>
-        <ScrollArea className="w-3/4 h-[calc(100vh-var(--header-height)-40px)] bg-white rounded-xl shadow-sm">
-          <div className="flex border-b justify-between py-3 px-3">
-            <p className="text-lg font-medium">Manage Contents</p>
-            <p className="text-stone-600">Last updated by:  Edwin Sumalinog  |  2023/09/05 09:05:02</p>
-          </div>
-          {children}
-        </ScrollArea>
-      </div>
+    <div className="bg-red-400 p-[3px] w-fit rounded-full">
+      <X width={16} height={16} strokeWidth={4} className="text-white" />
     </div>
   );
-};
+}

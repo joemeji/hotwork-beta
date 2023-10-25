@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
-import { BadgePlus, ChevronRight, FileDown, FileText, MoreHorizontal, Printer, QrCode, X } from "lucide-react";
-import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
+import { DropdownMenuItem, DropdownMenuItemProps } from "@radix-ui/react-dropdown-menu";
+import { BadgePlus, BookmarkIcon, ChevronRight, FileDown, FileText, MoreHorizontal, Printer, QrCode, X } from "lucide-react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { truncate } from "@/utils/text";
 import { BreakPointContext } from "@/context/layout-context";
@@ -18,11 +18,12 @@ import { faker } from "@faker-js/faker";
 import Highlighter from "react-highlight-words";
 import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
+import MoreOption from "../MoreOption";
 
 export const certificationActionButton = [
   {
     name: 'Certification',
-    icon: <BadgePlus className={cn("mr-2 h-[18px] w-[18px] text-red-400")} strokeWidth={2} />,
+    icon: <BookmarkIcon className={cn("mr-2 h-[18px] w-[18px] ")} strokeWidth={1} />,
     actionType: 'item-certification',
   },
 ];
@@ -30,12 +31,12 @@ export const certificationActionButton = [
 export const actionMenu = [
   {
     name: 'Type Plate',
-    icon: <QrCode className={cn("mr-2 h-[18px] w-[18px] text-green-400")} strokeWidth={2} />,
+    icon: <QrCode className={cn("mr-2 h-[18px] w-[18px] ")} strokeWidth={1} />,
     actionType: 'type-plate',
   },
   {
     name: 'QR Code',
-    icon: <QrCode className={cn("mr-2 h-[18px] w-[18px] text-blue-400")} strokeWidth={2} />,
+    icon: <QrCode className={cn("mr-2 h-[18px] w-[18px] ")} strokeWidth={1} />,
     actionType: 'qr-code',
   }, 
 ];
@@ -43,7 +44,7 @@ export const actionMenu = [
 export const serialNumberAction = [
   {
     name: 'View P/O',
-    icon: <Printer className={cn("mr-2 h-[18px] w-[18px] text-violet-400")} strokeWidth={2} />,
+    icon: <Printer className={cn("mr-2 h-[18px] w-[18px] ")} strokeWidth={1} />,
     actionType: 'po',
   },
   // {
@@ -55,10 +56,10 @@ export const serialNumberAction = [
 
 
 export const TH = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-3 px-2 text-sm bg-stone-100 text-stone-600', className)}>{children}</td>
+  <td className={cn('py-3 px-2 text-sm bg-stone-200 text-stone-600', className)}>{children}</td>
 );
 export const TD = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-2 px-2 group-last:border-0', className)}>{children}</td>
+  <td className={cn('py-2 px-2 border-b border-b-stone-100 group-last:border-0', className)}>{children}</td>
 );
 
 export const ActionButtonHeader = React.forwardRef((
@@ -85,14 +86,17 @@ export const ActionButtonHeader = React.forwardRef((
 });
 ActionButtonHeader.displayName = 'ActionButtonHeader';
 
-export const ItemMenu = ({ children, onClick }: { children: React.ReactNode, onClick?: (e: any) => void }) => {
+export const ItemMenu = (props: DropdownMenuItemProps) => {
+  const { children, onClick, className, ...rest } = props;
   return (
     <DropdownMenuItem 
       className={cn(
-        "flex items-center p-2 cursor-pointer",
-        "hover:bg-stone-100 rounded-lg outline-none"
+        "flex items-center p-2 px-3 cursor-pointer gap-1",
+        "hover:bg-stone-100 outline-none",
+        className
       )}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </DropdownMenuItem>
@@ -142,17 +146,17 @@ export const ItemEquipmentList = React.forwardRef((props: TypeItemEquipmentList,
               {children}
             </div>
               <Image 
-                width={100}
-                height={100}
-                src={faker.image.urlPicsumPhotos({ width: 100, height: 100 })}
+                width={90}
+                height={90}
+                src={faker.image.urlPicsumPhotos({ width: 90, height: 90 })}
                 // src="/images/No data-rafiki.svg"
-                className="h-[100] w-[100] rounded-sm max-w-max text-xs"
+                className="h-[90px] w-[90px] max-w-max text-xs"
                 alt={item_name}
               />
           </div>
-          <div className="flex flex-col h-[100px]">
+          <div className="flex flex-col h-[90px]">
             <Link className="flex flex-col" href={`/items/equipment/${_item_id}/details`}>
-              <span className="mb-1 font-medium group-hover:underline" title={item_name}>
+              <span className="mb-1 font-bold group-hover:underline" title={item_name}>
                 <Highlighter 
                   searchWords={_highlightResult ? _highlightResult.item_name.matchedWords : []}
                   autoEscape={true}
@@ -171,19 +175,19 @@ export const ItemEquipmentList = React.forwardRef((props: TypeItemEquipmentList,
               <button 
                 type="button"
                 className={cn(
-                  'mt-auto w-fit pr-3 ps-0 text-sm',
+                  'mt-auto w-fit pe-3 ps-0 text-sm',
                   'text-stone-900 font-medium',
                   'hover:bg-stone-200',
                   'flex items-center group/serial',
-                  'rounded-full',
+                  'rounded-xl border-2',
                 )}
                 onClick={() => onClickSerialButton && onClickSerialButton(_item_id)}
               >
-                  <span className="bg-stone-200 text-xs rounded-full py-1 w-7 h-7 flex items-center justify-center">
+                  <span className="text-sm font-bold rounded-full py-1 px-2 flex items-center justify-center">
                     {total_serial_numbers}
                   </span>
                 <span 
-                  className="ps-1 py-[3px] group-hover/serial:border-stone-300"
+                  className="py-[3px] group-hover/serial:border-stone-300 text-stone-500"
                 >
                   SN
                 </span>
@@ -194,7 +198,7 @@ export const ItemEquipmentList = React.forwardRef((props: TypeItemEquipmentList,
       </TD>
       <TD className="align-top">
       <div className="sub-categories">
-        <span className="text-stone-400">
+        <span className="text-stone-500">
           <Highlighter 
             searchWords={_highlightResult ? _highlightResult.item_category_name.matchedWords : []}
             autoEscape={true}
@@ -205,7 +209,7 @@ export const ItemEquipmentList = React.forwardRef((props: TypeItemEquipmentList,
     </TD>
       <TD className="align-top">
         <div className="sub-categories">
-          <span className="text-stone-400">
+          <span className="text-stone-500">
             <Highlighter 
               searchWords={_highlightResult ? _highlightResult.item_sub_category_name.matchedWords : []}
               autoEscape={true}
@@ -214,22 +218,15 @@ export const ItemEquipmentList = React.forwardRef((props: TypeItemEquipmentList,
           </span>
         </div>
       </TD>
-      <TD className="text-right pe-4">
-        <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="p-1 text-stone-400 border-0 bg-transparent h-auto rounded-full">
-                <MoreHorizontal className="w-5 h-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 border border-stone-50">
-              {[...actionMenu, ...certificationActionButton].map((action, key) => (
-                <ItemMenu key={key} onClick={() => onClickAction && onClickAction(action.actionType)}>
-                  {action.icon}
-                  <span className="text-stone-600 text-sm">{action.name}</span>
-                </ItemMenu>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <TD className="text-right pe-4 align-top">
+        <MoreOption>
+          {[...actionMenu, ...certificationActionButton].map((action, key) => (
+              <ItemMenu key={key} onClick={() => onClickAction && onClickAction(action.actionType)}>
+                {action.icon}
+                <span className="text-stone-600 font-medium">{action.name}</span>
+              </ItemMenu>
+            ))}
+        </MoreOption>
       </TD>
     </>
   );
@@ -289,16 +286,16 @@ const CategoryList = ({ categoryId, _item_category_id, item_category_name, sub_c
 
   const onShowSubCategories = useCallback(() => {
     let liHeights = 0;
-      if (sub_categories && Array.isArray(sub_categories)) {
-        sub_categories.forEach((li: any) => {
-          const liElem = li.listRef.current;
-          if (liElem) {
-            const { height } = liElem.getBoundingClientRect();
-            liHeights += height;
-          }
-        });
-      }
-      setUlHeight(liHeights);
+    if (sub_categories && Array.isArray(sub_categories)) {
+      sub_categories.forEach((li: any) => {
+        const liElem = li.listRef.current;
+        if (liElem) {
+          const { height } = liElem.getBoundingClientRect();
+          liHeights += height;
+        }
+      });
+    }
+    setUlHeight(liHeights);
   }, [sub_categories]);
 
   useEffect(() => {
@@ -309,7 +306,7 @@ const CategoryList = ({ categoryId, _item_category_id, item_category_name, sub_c
     } else {
       setOpenSub(false)
     }
-  }, [sub_categories, categoryId, _item_category_id, sub_category_id, onShowSubCategories]);
+  }, [sub_categories, categoryId, _item_category_id, onShowSubCategories, sub_category_id]);
 
   useEffect(() => {
     if (_sub_categories) {

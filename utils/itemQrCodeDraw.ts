@@ -77,7 +77,7 @@ export function itemTypePlate({
     doc.line(x, addressHeight - 1, width - x, addressHeight - 1);
 
     addressHeight += 3;
-    doc.setFont('', 'bold');
+    doc.setFont(undefined, 'bold');
     doc.text(qrcode.text, x, addressHeight);
 
     let qrWidth = width / 3;
@@ -86,7 +86,7 @@ export function itemTypePlate({
 
     x = qrWidth + x + 3;
     y = addressHeight + 3;
-    doc.setFont('', 'normal');
+    doc.setFont(undefined, 'normal');
     doc.text('Serial Number: ' + qrcode.value || '', x, y);
 
     y += 3;
@@ -135,14 +135,14 @@ export function propertyOf(serial_numbers: any[]) {
 
     y += 6;
     x += 10;
-    doc.setFont('', 'bold');
+    doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     doc.text(serial_number, x, y);
 
     let ny = height - 2;
 
     x += width / 2;
-    doc.setFont('', 'normal');
+    doc.setFont(undefined, 'normal');
     doc.setFontSize(7);
     doc.text('www.hotwork.ag', x, ny);
 

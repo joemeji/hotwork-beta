@@ -18,6 +18,7 @@ import { ActionButtonHeader, Categories, ItemEquipmentList, QRCodeModal, SelectA
 import itemQrCodeDraw, { generateQrCode, itemTypePlate } from "@/utils/itemQrCodeDraw";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PER_PAGE, client } from "@/utils/algoliaConfig";
 
 type ItemsDataType = {
   access_token: string
@@ -30,7 +31,7 @@ const ItemsData = (props: ItemsDataType) => {
   let indexParams = router.query?.index;
   const categoryId = indexParams ? indexParams[0] : undefined;
   const page = router.query?.page || 1; 
-  const search = router.query?.search || ''; 
+  const search: any = router.query?.search || ''; 
   const sub_category_id = router.query?.sub_category_id || ''; 
   const [dataToSelect, setDataToSelect] = useState<any[]>([]);
   const [openQrCodesModal, setOpenQrCodesModal] = useState<boolean>(false);
@@ -42,13 +43,16 @@ const ItemsData = (props: ItemsDataType) => {
   const [openSNModal, setOpenSNModal] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const listHeaderRef = useRef<HTMLDivElement>(null);
+  const [itemData, setItemData] = useState<any>(undefined);
+  const [itemIsLoading, setItemIsLoading] = useState<any>(false);
+  const [itemError, setItemError] = useState<any>(null);
 
-  let paramsObj: any = { page: String(page), search };
+  let paramsObj: any = { page: String(page) };
   if (sub_category_id) paramsObj = { sub_category_id };
   let searchParams = new URLSearchParams(paramsObj);
 
-  const { data, isLoading, error } = useSWR(
-    [`/api/items/category${(categoryId ? '/' + categoryId : '')}?${searchParams.toString()}`, access_token], 
+  let { data, isLoading, error } = useSWR(
+    [search ? null : `/api/items/category${(categoryId ? '/' + categoryId : '')}?${searchParams.toString()}`, access_token], 
     fetchApi,
     {
       revalidateOnFocus: false,
@@ -150,7 +154,7 @@ const ItemsData = (props: ItemsDataType) => {
   }
 
   async function generateItemQrCode(_item_id: string, serial_number?: string) {
-    const items = data.items;
+    const items = itemData ? itemData.items : [];
     const item = items.find((item: any) => item._item_id === _item_id);
     const itemSerialNumber = serial_number || item.item_sub_category_index + item.item_number + '.000';
 
@@ -213,16 +217,69 @@ const ItemsData = (props: ItemsDataType) => {
   }
 
   useEffect(() => {
-    if (data && data.items && Array.isArray(data.items)) {
-      const _dataItems = data.items.map((item: any) => {
+    (async () => {
+      if (search) {
+        let __data = {...data};
+        let ___isLoading = isLoading;
+        let ___error = error;
+        try {
+          const index = client.initIndex('item_index');
+
+          const hits = await index.search(search, {
+            page: Number(page) - 1,
+            hitsPerPage: PER_PAGE,
+            attributesToHighlight: [
+              'item_name',
+              'item_number',
+              'item_category_name',
+              'item_sub_category_name',
+              '_item_id'
+            ]
+          });
+
+          if (hits && hits.hits) {
+            __data['items'] = hits.hits;
+            ___isLoading = false;
+          }
+
+          if (hits && hits.nbHits > PER_PAGE) {
+            const res = await fetch(baseUrl + `/pager/links?page=${page}&total=${hits.nbHits}`);
+            const links = await res.text();
+            __data['pager'] = links;
+          }
+        }
+        catch(err: any) {
+          ___isLoading = false;
+          ___error = err;
+        }
+
+        setItemData(__data);
+        setItemIsLoading(___isLoading);
+        setItemError(___error);
+      }
+    })();
+
+  }, [data, search, page, error, isLoading]);
+
+  useEffect(() => {
+    if (!search) {
+      setItemData(data);
+      setItemIsLoading(isLoading);
+      setItemError(error);
+    }
+  }, [data, isLoading, error, search]);
+
+  useEffect(() => {
+    if (itemData && itemData.items && Array.isArray(itemData.items)) {
+      const _dataItems = itemData.items ? itemData.items.map((item: any) => {
         return {
           _item_id: item._item_id,
           checked: false,
         }
-      });
+      }) : [];
       setDataToSelect(_dataItems);
     }
-  }, [data]);
+  }, [itemData]);
 
   return (
     <>
@@ -280,7 +337,7 @@ const ItemsData = (props: ItemsDataType) => {
               <SelectAll 
                 onCheckedChange={(isChecked: any) => onSelectAllItem(isChecked)} 
                 checked={(dataToSelect.filter((item: any) => !item.checked).length === 0)}
-                disabled={isLoading && error}
+                disabled={itemIsLoading && itemError}
               />
               {selectedItems().length > 0 && actionMenu.map((action, key) => (
                 <ActionButtonHeader 
@@ -320,8 +377,8 @@ const ItemsData = (props: ItemsDataType) => {
               </tr>
             </thead>
             <tbody>
-              {data && data.items && data.items.map((item: any, key: number) => (
-                <tr key={key} className="even:bg-stone-50 group/item">
+              {itemData && itemData.items && itemData.items.map((item: any, key: number) => (
+                <tr key={key} className="group/item">
                   <ItemEquipmentList
                     _item_id={item._item_id}
                     item_name={item.item_name}
@@ -351,7 +408,7 @@ const ItemsData = (props: ItemsDataType) => {
                   </ItemEquipmentList>
                 </tr>
               ))}
-              {(data && data.items && data.items.length === 0) && (
+              {(itemData && itemData.items && itemData.items.length === 0) && (
                 <tr>
                   <td colSpan={4}>
                     <div className="flex justify-center">
@@ -365,7 +422,7 @@ const ItemsData = (props: ItemsDataType) => {
                   </td>
                 </tr>
               )}
-              {isLoading && [1,2,3,4,5,6,7].map((skele, key) => (
+              {itemIsLoading && [1,2,3,4,5,6,7].map((skele, key) => (
                 <tr key={key}>
                   <td colSpan={4}>
                     <div className="p-2 w-full">
@@ -384,10 +441,10 @@ const ItemsData = (props: ItemsDataType) => {
             </tbody>
           </table>
 
-          {data && data.pager && (
+          {itemData && itemData.pager && (
             <div className="mt-auto border-t border-t-stone-100">
               <Pagination 
-                pager={data.pager}
+                pager={itemData.pager}
                 onPaginate={onPaginate}
               />
             </div>

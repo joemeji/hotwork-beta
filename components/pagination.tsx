@@ -71,4 +71,20 @@ export function parsePager(html: string) {
   return links;
 }
 
+export function beginScrollDataPagerForInfiniteswr(data: any) {
+  if (data && Array.isArray(data)) {
+    const lastDataItem: any = data[data.length - 1];
+    if (!lastDataItem) return null;
+    const pages = parsePager(lastDataItem.pager);
+    const page: any = pages.find((item: any) => item.active);
+    if (!page) return null;
+    const lastPage = pages[pages.length - 1];
+    const activePagePage = Number(page.page);
+    const lastPagePage = Number(lastPage.page);
+    if (activePagePage === lastPagePage) return null;
+    return activePagePage;
+  }
+  return null;
+}
+
 export default Pagination;

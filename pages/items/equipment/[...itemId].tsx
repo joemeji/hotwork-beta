@@ -121,7 +121,7 @@ export default function ItemId({ _item_id, _item_id_path, access_token, currenci
               </div>
             </div>
 
-            <div className="flex py-2 bg-white shadow-sm rounded-xl px-3 mb-3 gap-1 sticky top-[calc(var(--header-height)+4px)] z-10">
+            <div className="flex py-2 bg-white shadow-sm rounded-xl px-3 mb-2 gap-1 sticky top-[calc(var(--header-height)+4px)] z-10">
               <ItemTabs />
             </div>
             
@@ -183,12 +183,12 @@ export default function ItemId({ _item_id, _item_id_path, access_token, currenci
                 <h1 className="font-medium text-lg mb-1">Images</h1>
               </div>
               <div className="flex">
-                <button className="bg-stone-50 p-2 rounded-full hover:bg-stone-100">
+                <button className="bg-stone-200 p-2 rounded-xl hover:bg-stone-300">
                   <Plus className="text-stone-600" />
                 </button>
               </div>
             </div>
-            <div className="flex flex-col rounded-t-xl overflow-hidden">
+            <div className="flex flex-col rounded-t-xl overflow-hidden p-3 gap-3">
               {[0,0,0,0,0,0,0].map((img: any, key: number) => {
                 return (
                   <Image 

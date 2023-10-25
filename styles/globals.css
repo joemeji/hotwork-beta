@@ -78,7 +78,7 @@
     --header-height: 70px;
     --headerTopSideBarWidth: 300px;
     --headerTopSideBarWidthMd: 96px;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .quickSearch-categories::-webkit-scrollbar {
@@ -121,7 +121,7 @@
   }
 
   button.loading:after {
-    @apply absolute border-4 border-stone-300 border-t-transparent rounded-full w-[24px] h-[24px] animate-spin;
+    @apply absolute border-2 border-stone-300 border-t-transparent rounded-full w-[20px] h-[20px] animate-spin;
     content: '';
   }
 
@@ -159,5 +159,14 @@
     opacity: 0;
     transform: scale(0.9);
     transition: opacity 300ms, transform 300ms;
+  }
+
+  .combobox-selector div[data-radix-scroll-area-viewport] {
+    /* min-height: 100px; */
+    max-height: 250px;
+  }
+
+  .truncate {
+    @apply whitespace-nowrap overflow-hidden text-ellipsis;
   }
 }

@@ -13,13 +13,6 @@ interface DetailsTabType extends TabType {
   access_token?: string
 }
 
-export const formatter = (currency: string) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  });
-};
-
 export const actionMenu = [
   {
     name: 'Edit',

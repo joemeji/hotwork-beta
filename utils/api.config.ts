@@ -1,6 +1,6 @@
 import jwt_decode from "jwt-decode";
 
-export const baseUrl = process.env.API_ENDPOINT || 'https://api.hotwork.ag';
+export const baseUrl = process.env.API_ENDPOINT || 'http://localhost:8080';
 
 export const azureStorageUrl = 'https://hotware.blob.core.windows.net/apps/Hotware';
 
@@ -65,3 +65,5 @@ export const fetchApi = async ([url, token]: any) => {
 
   return res.json();
 }
+
+export const fetcher = (url: any) => fetch(url).then((res) => res.json());

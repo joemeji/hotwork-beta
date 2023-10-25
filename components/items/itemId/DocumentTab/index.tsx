@@ -1,10 +1,9 @@
-import { SelectAll, TH } from "../..";
+import { SelectAll, TH, TD } from "../..";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import useSWR from "swr";
 import { fetchApi } from "@/utils/api.config";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TD } from "@/components/admin-pages/users";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { avatarFallback } from "@/utils/avatar";
 import dayjs from "dayjs";
@@ -88,7 +87,7 @@ export default function DocumentTab(props: DetailsTabType) {
                 </tr>
               )}
             {data && Array.isArray(data.reports) && data.reports.map((report: any, key: number) => (
-              <tr key={key} className="even:bg-stone-50 group">
+              <tr key={key} className="hover:bg-stone-50 group">
                 <TD className="text-sm ps-4">
                   <div className="flex items-center">
                     <Checkbox 
@@ -101,7 +100,7 @@ export default function DocumentTab(props: DetailsTabType) {
                   </div>
                 </TD>
                 <TD>
-                  <div className="w-7 h-7 bg-stone-100 flex items-center justify-center rounded-full font-medium text-stone-600">
+                  <div className="w-7 h-7 bg-stone-100 flex items-center justify-center rounded-full font-medium text-stone-600 text-sm">
                     {report.form_report_no}
                   </div>
                 </TD>

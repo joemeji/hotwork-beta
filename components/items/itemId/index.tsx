@@ -79,7 +79,6 @@ export function ItemTabs() {
           key={key}
           href={'/items/equipment/' + _item_id + '/' + link.path}
           className={cn(
-            "rounded-full",
             _item_id_2 === link.path  && "bg-stone-600 text-stone-200"
           )}
         >

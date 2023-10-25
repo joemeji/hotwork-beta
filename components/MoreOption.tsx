@@ -1,0 +1,33 @@
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import React, { useState } from "react";
+import { cn } from "@/lib/utils";
+
+export default function MoreOption({ children, contentClassName, menuTriggerChildren, triggerButtonClassName }: { children: React.ReactNode, triggerButtonClassName?: string, contentClassName?: string, menuTriggerChildren?: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <DropdownMenu modal={false} 
+      onOpenChange={(open) => setOpen(open)}
+      open={open}
+    >
+      <DropdownMenuTrigger asChild>
+        {menuTriggerChildren || (
+          <Button variant="outline" 
+            className={cn(
+              "p-2 border-0 bg-transparent h-auto rounded-xl",
+              open && "bg-stone-100",
+              triggerButtonClassName
+            )}
+          >
+            <MoreHorizontal className="w-5 h-5" strokeWidth={1} />
+          </Button>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className={cn("border border-stone-100 px-0 py-2", contentClassName)}>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

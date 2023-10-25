@@ -1,6 +1,6 @@
-import { baseUrl } from "@/utils/api.config";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { baseUrl } from '@/utils/api.config';
 
 export const authOptions = {
   providers: [

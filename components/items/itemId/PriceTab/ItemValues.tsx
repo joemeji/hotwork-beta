@@ -1,7 +1,7 @@
 import { fetchApi } from "@/utils/api.config";
 import { useState } from "react";
 import useSWR from "swr";
-import { Modal, actionMenu, formatter } from ".";
+import { Modal, actionMenu } from ".";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { MoreHorizontal, Plus } from "lucide-react";
 import Pagination from "@/components/pagination";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ItemMenu } from "../..";
+import { ItemMenu, TD, TH } from "../..";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { formatter } from "@/utils/text";
 
 const yupSchema = yup.object({
   iv_amount: yup.number().positive('Amount must be a positive number').typeError('Amount must be a number'),
@@ -161,7 +162,7 @@ export default function ItemValues({ _item_id, access_token, currencies }: any) 
         <table className="w-full text-left">
           <thead>
             <tr>
-              <TH className="ps-4 w-[30%]">Value</TH>
+              <TH className="ps-4 w-[140px] text-center">Value</TH>
               <TH className="w-[30%]">Currency</TH>
               <TH>Category</TH>
               <TH className="text-right pe-4">Actions</TH>
@@ -187,8 +188,8 @@ export default function ItemValues({ _item_id, access_token, currencies }: any) 
               ))
             )}
             {item_value_data && Array.isArray(item_value_data.items) && item_value_data.items.map((iv: any, key: number) => (
-              <tr key={key} className="hover:bg-stone-100 even:bg-stone-50">
-                <TD className="font-medium ps-4">
+              <tr key={key} className="hover:bg-stone-100">
+                <TD className="font-medium ps-4 text-right pe-5">
                   {iv.iv_amount ? formatter(iv.currency).format(iv.iv_amount) : ''}
                 </TD>
                 <TD>
@@ -234,11 +235,3 @@ export default function ItemValues({ _item_id, access_token, currencies }: any) 
     </>
   );
 }
-
-const TH = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-3 px-2 text-sm bg-stone-100 text-stone-700 font-medium', className)}>{children}</td>
-);
-
-const TD = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-2 px-2 group-last:border-0', className)}>{children}</td>
-);

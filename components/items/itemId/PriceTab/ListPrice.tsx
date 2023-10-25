@@ -7,10 +7,11 @@ import { MoreHorizontal, Plus } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ItemMenu } from "../..";
+import { ItemMenu, TD, TH } from "../..";
 import Pagination from "@/components/pagination";
-import { Modal, actionMenu, formatter } from ".";
+import { Modal, actionMenu } from ".";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatter } from "@/utils/text";
 
 export default function ListPrice({ _item_id, access_token, currencies }: any) {
   const [page, setPage] = useState(1);
@@ -84,9 +85,9 @@ export default function ListPrice({ _item_id, access_token, currencies }: any) {
         <table className="w-full text-left">
           <thead>
             <tr>
-              <TH className="ps-4 w-[30%]">Price</TH>
-              <TH className="w-[30%]">Currency</TH>
-              <TH className="text-right pe-4">Actions</TH>
+              <TH className="font-medium ps-4 w-[30%]">Price</TH>
+              <TH className="font-medium w-[30%]">Currency</TH>
+              <TH className="font-medium text-right pe-4">Actions</TH>
             </tr>
           </thead>
           <tbody>
@@ -94,19 +95,13 @@ export default function ListPrice({ _item_id, access_token, currencies }: any) {
             [1,2,3,4,5,6,7,8,9].map((item: any, key: number) => (
               <tr key={key}>
                 <TD>
-                  <Skeleton className="w-[100%] h-9" />
-                </TD>
-                <TD>
-                  <Skeleton className="w-[100%] h-9" />
-                </TD>
-                <TD>
-                  <Skeleton className="w-[100%] h-9" />
+                  <Skeleton className="w-[70%] h-9" />
                 </TD>
               </tr>
             ))
           )}
             {list_price_data && Array.isArray(list_price_data.items) && list_price_data.items.map((iv: any, key: number) => (
-              <tr key={key} className="hover:bg-stone-100 even:bg-stone-50">
+              <tr key={key} className="hover:bg-stone-100 ">
                 <TD className="font-medium ps-4">
                   {iv.ilp_price ? formatter(iv.currency).format(iv.ilp_price) : ''}
                 </TD>
@@ -152,11 +147,3 @@ export default function ListPrice({ _item_id, access_token, currencies }: any) {
     </>  
   );
 }
-
-const TH = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-3 px-2 text-sm bg-stone-100 text-stone-700 font-medium', className)}>{children}</td>
-);
-
-const TD = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-2 px-2 group-last:border-0', className)}>{children}</td>
-);

@@ -1,7 +1,7 @@
 import { fetchApi } from "@/utils/api.config";
 import { useState } from "react";
 import useSWR from "swr";
-import { Modal, actionMenu, formatter } from ".";
+import { Modal, actionMenu } from ".";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import unitTypes from "@/utils/unitTypes";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
 import Pagination from "@/components/pagination";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ItemMenu } from "../..";
+import { ItemMenu, TD, TH } from "../..";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatter } from "@/utils/text";
 
 export default function PurchasePrice({ _item_id, access_token, currencies }: any) {
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -106,11 +107,11 @@ export default function PurchasePrice({ _item_id, access_token, currencies }: an
         <table className="w-full text-left">
           <thead>
             <tr>
-              <TH className="ps-4 w-[30%]">Supplier</TH>
-              <TH className="w-[15%]">Unit</TH>
-              <TH className="w-[15%]">Currency</TH>
+              <TH className="font-medium ps-4 w-[30%]">Supplier</TH>
+              <TH className="font-medium w-[15%]">Unit</TH>
+              <TH className="font-medium w-[15%]">Currency</TH>
               <TH >Price</TH>
-              <TH className="text-right pe-4">Actions</TH>
+              <TH className="font-medium text-right pe-4">Actions</TH>
             </tr>
           </thead>
           <tbody>
@@ -136,7 +137,7 @@ export default function PurchasePrice({ _item_id, access_token, currencies }: an
               ))
             )}
             {purchase_price_data && Array.isArray(purchase_price_data.items) && purchase_price_data.items.map((iv: any, key: number) => (
-              <tr key={key} className="hover:bg-stone-100 even:bg-stone-50">
+              <tr key={key} className="hover:bg-stone-100">
                 <TD className="font-medium ps-4 py-3.5">
                   {iv.cms_name}
                 </TD>
@@ -186,11 +187,3 @@ export default function PurchasePrice({ _item_id, access_token, currencies }: an
     </>  
   );
 }
-
-const TH = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-3 px-2 text-sm bg-stone-100 text-stone-700 font-medium', className)}>{children}</td>
-);
-
-const TD = ({ className, children }: { className?: string, children?: React.ReactNode }) => (
-  <td className={cn('py-2 px-2 group-last:border-0', className)}>{children}</td>
-);

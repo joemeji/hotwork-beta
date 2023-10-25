@@ -1,3 +1,4 @@
+import MoreOption from "@/components/MoreOption";
 import AdminLayout from "@/components/admin-layout";
 import { ItemMenu, actionMenu } from "@/components/items";
 import Pagination from "@/components/pagination";
@@ -14,6 +15,7 @@ import { avatarFallback } from "@/utils/avatar";
 import { MoreHorizontal } from "lucide-react";
 import { GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from 'swr';
@@ -119,33 +121,35 @@ export default function ShippingList({ access_token }: any) {
               {data && Array.isArray(data.shipping) && data.shipping.map((row: any, key: number) => (
                 <tr key={key} className="group">
                   <TD className="ps-4 align-top">
-                    <span className="text-blue-600 font-medium">
-                      {row.shipping_number}
-                    </span>
+                    <Link href={`${router.pathname}/${row._shipping_id}`}>
+                      <span className="text-blue-600 font-medium">
+                        {row.shipping_number}
+                      </span>
+                    </Link>
                   </TD>
                   <TD className="align-top">
                     <div className="flex flex-col">
                       <span className="font-medium text-sm uppercase">{row.supplier}</span>
-                      <span className="text-sm text-stone-400">{row.supplier_address_building ? row.supplier_address_building + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.supplier_address_country ? row.supplier_address_country : ""}</span>
+                      <span className="text-sm text-stone-500">{row.supplier_address_building ? row.supplier_address_building + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.supplier_address_country ? row.supplier_address_country : ""}</span>
                     </div>
                   </TD>
                   <TD className="align-top">
                     <div className="flex flex-col">
                       <span className="font-medium text-sm uppercase">{row.client}</span>
-                      <span className="text-sm text-stone-400">{row.cms_address_building ? row.cms_address_building + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.cms_address_street ? row.cms_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.cms_address_city ? row.cms_address_city + ", " : ""}</span>
-                      <span className="text-sm text-stone-400">{row.cms_address_country ? row.cms_address_country : ""}</span>
+                      <span className="text-sm text-stone-500">{row.cms_address_building ? row.cms_address_building + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.cms_address_street ? row.cms_address_street + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.cms_address_city ? row.cms_address_city + ", " : ""}</span>
+                      <span className="text-sm text-stone-500">{row.cms_address_country ? row.cms_address_country : ""}</span>
                     </div>
                   </TD>
                   <TD className="align-top">
                     <TooltipProvider delayDuration={400}>
                       <Tooltip>
                         <TooltipTrigger>
-                          <Avatar className="w-12 h-12">
+                          <Avatar className="w-11 h-11">
                             <AvatarImage src={row.user_photo} alt={row.user_lastname + ' ' + row.user_lastname} />
                             <AvatarFallback className="font-medium text-white" style={{ background: row.avatar_color }}>
                               {avatarFallback(row.user_firstname || 'N', row.user_lastname || 'A')}
@@ -174,21 +178,14 @@ export default function ShippingList({ access_token }: any) {
                     </p>
                   </TD>
                   <TD className="align-top text-right pe-4">
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="p-1 text-stone-400 border-0 bg-transparent h-auto rounded-full">
-                          <MoreHorizontal className="w-5 h-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40 border border-stone-50">
-                        {[...actionMenu].map((action, key) => (
-                          <ItemMenu key={key}>
-                            {action.icon}
-                            <span className="text-stone-600 text-sm">{action.name}</span>
-                          </ItemMenu>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <MoreOption>
+                      {[...actionMenu].map((action, key) => (
+                        <ItemMenu key={key}>
+                          {action.icon}
+                          <span className="text-stone-600 text-sm">{action.name}</span>
+                        </ItemMenu>
+                      ))}
+                    </MoreOption>
                   </TD>
                 </tr>
               ))}
