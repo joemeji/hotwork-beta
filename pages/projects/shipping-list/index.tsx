@@ -59,9 +59,9 @@ export default function ShippingList({ access_token }: any) {
   return (
     <AdminLayout>
       <div className="p-[20px] w-full max-w-[1600px] mx-auto">
-        <p className="text-xl flex font-medium mb-3">Shipping List</p>
         <div className="bg-white w-full rounded-xl shadow-sm">
-          <div className="flex justify-between p-4">
+          <div className="flex justify-between p-4 items-center">
+            <p className="text-xl flex font-medium">Shipping List</p>
             <form onSubmit={onSearch}>
               <Input type="search" placeholder="Search" 
                 className="rounded-xl placeholder:text-stone-400 w-[400px]"

@@ -49,9 +49,9 @@ const ItemList = ({ item, children, open, onClickOpen, onCompleted, onRemove, nu
   const shippingDetails: any = useContext(ShippingDetailsContext);
 
   const unitValue = (num: number) => {
-    if (shippingDetails) {  
-      return formatter(shippingDetails.currency).format(num);
-    }
+    // if (shippingDetails) {  
+    //   return formatter(shippingDetails.currency).format(num);
+    // }
     return num;
   };
 

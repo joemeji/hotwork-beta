@@ -68,9 +68,9 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
   const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   const unitValue = (num: number) => {
-    if (shippingDetails) {
-      return formatter(shippingDetails.currency).format(num);
-    }
+    // if (shippingDetails) {
+    //   return formatter(shippingDetails.currency).format(num);
+    // }
     return num;
   };
 

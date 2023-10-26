@@ -31,9 +31,7 @@ export default function Home() {
 
   return (
     <AdminLayout>
-      <h1 className="text-lg font-medium">Dashboard coming soon.</h1>
-      <button onClick={() => signIn('credentials')}>Sign in</button>
-      <button onClick={() => signOut()}>Sign out</button>
+      <h1 onClick={() => signOut()} className="text-center">Dashboard coming soon.</h1>
     </AdminLayout>
   );
 }

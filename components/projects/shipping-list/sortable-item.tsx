@@ -134,7 +134,8 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
             </div>
             <div className="w-[215px] p-2 text-right">
               <span className="text-sm">
-                {shippingDetails ? formatter(shipping_currency).format(item.shipping_item_unit_value) : 0}
+                {/* {shippingDetails ? formatter(shipping_currency).format(item.shipping_item_unit_value) : 0} */}
+                {shippingDetails ? item.shipping_item_unit_value : 0}
               </span>
             </div>
           </div>

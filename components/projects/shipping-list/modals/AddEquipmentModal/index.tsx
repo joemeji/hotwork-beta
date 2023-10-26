@@ -213,7 +213,6 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
               <ScrollArea className="bg-white rounded-xl"
                 style={{
                   width: !existingEquipmentOnly ? '410px' : 0,
-                  maxHeight: 'calc(100vh - 100px)'
                 }}
               >
                 <MenuHeader className="justify-center items-center text-lg font-medium">
