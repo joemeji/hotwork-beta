@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { getCsrfToken, signIn } from "next-auth/react";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 export default function Signin({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
@@ -54,6 +56,17 @@ const FormLogin = ({ csrfToken }: InferGetServerSidePropsType<typeof getServerSi
 
 // This is the recommended way for Next.js 9.3 or newer
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerSession( context.req, context.res, authOptions );
+
+  if (session && session.user) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
   return {
     props: {
       csrfToken: await getCsrfToken(context),

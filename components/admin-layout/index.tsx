@@ -80,7 +80,7 @@ export default function AdminLayout({ children, hasSidebar = true,  hasHeader = 
             className={cn(
               'min-h-[calc(100vh-var(--header-height))]',
               'z-0 dark:text-zinc-300 w-[calc(100%-var(--sidebar-width))] ms-[var(--sidebar-width)]',
-              'transition-all duration-200',
+              // 'transition-all duration-200',
               'mt-[var(--header-height)]',
             )}
             style={{

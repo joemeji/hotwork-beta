@@ -1,37 +1,41 @@
 'use client';
 
 import AdminLayout from "@/components/admin-layout";
-import { appClientFetch, authHeaders } from "@/utils/api.config";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useEffect } from "react";
+import { GetServerSidePropsContext } from "next";
+import { getServerSession } from "next-auth";
+import { useSession, signOut } from "next-auth/react";
+import { authOptions } from "./api/auth/[...nextauth]";
 
 export default function Home() {
   const { data: session, status: authStatus } = useSession();
 
-  console.log(session)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await appClientFetch({
-          url: '/api/items',
-          authStatus,
-          options: {
-            headers: { ...authHeaders(session?.user) }
-          }
-        })
-        console.log(res);
-      }
-      catch(e) {
-        console.log('Error: ' + e)
-      }
-    }
-    fetchData();
-  }, [authStatus, session?.user]);
+  console.log(session);
 
   return (
     <AdminLayout>
       <h1 onClick={() => signOut()} className="text-center">Dashboard coming soon.</h1>
     </AdminLayout>
   );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerSession( context.req, context.res, authOptions );
+  let token  = null;
+
+  if (session && session.user) {
+    token = session.user.access_token;
+  } else {
+    return {
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      access_token: token,
+    },
+  }
 }
