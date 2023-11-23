@@ -34,12 +34,12 @@ function SelectShippingCategoryModal(props: SelectShippingCategoryModal) {
     }
   }, [selectedCategory, data, onOpenChange, onSelectedCategory]);
   
-  // const onAddedCategory = useCallback((categoryAdded: ShippingCategory) => {
-  //   const _data = [...data];
-  //   _data.push(categoryAdded);
-  //   mutate(_data);
-  //   setOpenAddCategoryModal(false);
-  // }, [data, mutate]);
+  const onAddedCategory = useCallback((categoryAdded: ShippingCategory) => {
+    const _data = [...data];
+    _data.push(categoryAdded);
+    mutate(_data);
+    setOpenAddCategoryModal(false);
+  }, [data, mutate]);
 
   useEffect(() => {
     if (open) setSelectedCategory(null);
@@ -52,6 +52,7 @@ function SelectShippingCategoryModal(props: SelectShippingCategoryModal) {
         onOpenChange={(open: any) => setOpenAddCategoryModal(open)}
         access_token={access_token}
         shipping_id={shipping_id}
+        onAddedCategory={onAddedCategory}
       />
       <Dialog 
         open={open} 
