@@ -8,7 +8,7 @@ import { authHeaders, baseUrl } from "@/utils/api.config";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { memo, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export const previewType = [
   'Packing List',
@@ -48,13 +48,15 @@ const ShippingPreview = (props: ShippingPreviewProps) => {
   const queryType = type || router.query.type;
   const routerQuery: any = router.query;
   
-  const pageRoute: any = {
-    pathname: router.pathname,
-    query: {
-      shipping_id: router.query.shipping_id,
-      ...routerQuery
-    },
-  };
+  const pageRoute: any = useMemo(() => {
+    return {
+      pathname: router.pathname,
+      query: {
+        shipping_id: router.query.shipping_id,
+        ...routerQuery
+      },
+    }
+  }, [routerQuery, router]);
 
   const onDownload = () => {
     const a = document.createElement('a');

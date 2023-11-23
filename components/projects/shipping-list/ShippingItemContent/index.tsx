@@ -282,7 +282,7 @@ function ShippingItemContent({ access_token }: any) {
     }
     _dataItems = [..._dataItems].map((item: any) => ({ ...item }));
     return _dataItems;
-  }, [shippingItems]);
+  }, [shippingItems, data]);
 
   useEffect(() => {
     if (data) {

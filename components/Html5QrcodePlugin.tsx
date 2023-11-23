@@ -11,8 +11,9 @@ type Html5QrcodePlugin = {
   onError?: (errorMessage?: string) => void
 };
 
+let html5QrCode: Html5Qrcode;
+
 const Html5QrcodePlugin = (props: Html5QrcodePlugin) => {
-  let html5QrCode: Html5Qrcode;
 
   useEffect(() => {
     if (!html5QrCode?.getState()) {
@@ -35,7 +36,7 @@ const Html5QrcodePlugin = (props: Html5QrcodePlugin) => {
         html5QrCode.stop().catch(error => console.log(error))
       }
     }
-  }, []);
+  }, [props.onSuccessScan, props.onErrorScan, props.onError]);
 
     return (
       <div id={readerId} />
