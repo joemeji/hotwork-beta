@@ -90,7 +90,11 @@ export default function Users(props: UsersProps) {
                   <TD className="w-20">
                     <div>
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={user.user_photo} alt={user.user_lastname + ' ' + user.user_lastname} />
+                        <AvatarImage 
+                          src={`${baseUrl}/users/thumbnail/${user.user_photo}`} 
+                          alt={user.user_lastname + ' ' + user.user_lastname} 
+                          className="object-cover"
+                        />
                         <AvatarFallback className="font-medium text-white" style={{ background: user.avatar_color }}>
                           {avatarFallback(user.user_firstname, user.user_lastname)}
                         </AvatarFallback>

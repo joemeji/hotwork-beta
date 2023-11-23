@@ -4,15 +4,17 @@ import { Input } from "@/components/ui/input";
 import { authHeaders, baseUrl } from "@/utils/api.config";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { useSWRConfig } from "swr";
 
 function AddCategoryModal(props: AddCategoryType) {
-  const { open, onOpenChange, shipping_id, access_token, onAddedCategory, onError, category_update } = props;
+  const { open, onOpenChange, shipping_id, access_token, onError, category_update } = props;
   const [categoryName, setCategoryName] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const { mutate } = useSWRConfig();
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
@@ -35,8 +37,9 @@ function AddCategoryModal(props: AddCategoryType) {
         setLoadingSubmit(false);
       }
       
-      if (json && json.success) {
-        onAddedCategory && onAddedCategory(json.category);  
+      if (json && json.success) { 
+        mutate(`/api/shipping/${shipping_id}/items`);
+        console.log('fsd')
         setLoadingSubmit(false);
         setErrorMessage(null);
         onOpenChange && onOpenChange(false);
@@ -108,7 +111,6 @@ type AddCategoryType = {
   onOpenChange?: (open?: boolean) => void
   access_token: string | any
   shipping_id: any
-  onAddedCategory?: (category: ShippingCategory) => void
   onError?: (error: any) => any
   category_update?: any
 }

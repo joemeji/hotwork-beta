@@ -225,28 +225,28 @@ export default function Form({ equipmentDetails, formImageSvg, formData: _formDa
             </div>
             <div className="bg-white rounded-bl-xl rounded-br-xl shadow-sm pb-4">
               <Tabs defaultValue="report-form" className="w-full">
-                <TabsList className="bg-stone-200 w-full h-auto py-3 rounded-none gap-2">
+                <TabsList className="w-full h-auto py-2 rounded-none gap-2">
                   <TabsTrigger 
                     className={cn(
-                      "py-2 rounded-full text-stone-600 border border-stone-300",
+                      "py-1 rounded-full text-stone-600 bg-stone-100",
                       "data-[state=active]:bg-white data-[state=active]:border-white" 
                     )}
                     value="report-form">Report Form</TabsTrigger>
                   <TabsTrigger 
                     className={cn(
-                      "py-2 rounded-full text-stone-600 border border-stone-300",
+                      "py-1 rounded-full text-stone-600 bg-stone-100",
                       "data-[state=active]:bg-white data-[state=active]:border-white" 
                     )}
                     value="verified-plates">Verified Plates</TabsTrigger>
                   <TabsTrigger 
                     className={cn(
-                      "py-2 rounded-full text-stone-600 border border-stone-300",
+                      "py-1 rounded-full text-stone-600 bg-stone-100",
                       "data-[state=active]:bg-white data-[state=active]:border-white" 
                     )}
                     value="isolation">Isolation</TabsTrigger>
                   <TabsTrigger 
                     className={cn(
-                      "py-2 rounded-full text-stone-600 border border-stone-300",
+                      "py-1 rounded-full text-stone-600 bg-stone-100",
                       "data-[state=active]:bg-white data-[state=active]:border-white" 
                     )}
                     value="signature">Signature</TabsTrigger>

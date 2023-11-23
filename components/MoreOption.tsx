@@ -4,7 +4,19 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dro
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function MoreOption({ children, contentClassName, menuTriggerChildren, triggerButtonClassName }: { children: React.ReactNode, triggerButtonClassName?: string, contentClassName?: string, menuTriggerChildren?: React.ReactNode }) {
+export default function MoreOption(
+  { 
+    children, 
+    contentClassName, 
+    menuTriggerChildren, 
+    triggerButtonClassName 
+  }: 
+  { 
+    children: React.ReactNode, 
+    triggerButtonClassName?: string, 
+    contentClassName?: string, 
+    menuTriggerChildren?: React.ReactNode 
+  }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,7 +28,7 @@ export default function MoreOption({ children, contentClassName, menuTriggerChil
         {menuTriggerChildren || (
           <Button variant="outline" 
             className={cn(
-              "p-2 border-0 bg-transparent h-auto rounded-xl",
+              "p-1 border-0 bg-transparent h-auto",
               open && "bg-stone-100",
               triggerButtonClassName
             )}

@@ -2,10 +2,12 @@ import AvatarProfile from "@/components/AvatarProfile";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { baseUrl } from "@/utils/api.config";
 import dayjs from "dayjs";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
+import StatusChip from "../StatusChip";
 
 function ShippingDetails(props: ShippingDetailsProps) {
   const { details } = props;
@@ -13,7 +15,7 @@ function ShippingDetails(props: ShippingDetailsProps) {
   
   return (
     <>
-      <div className="w-1/4 h-[calc(100vh-var(--header-height)-40px)] top-[calc(var(--header-height)+20px)] rounded-xl overflow-hidden sticky shadow-[1px_2px_10px_#1111111a]">
+      <div className="w-1/4 h-[calc(100vh-var(--header-height)-40px)] top-[calc(var(--header-height)+20px)] rounded-sm overflow-hidden sticky">
         <ScrollArea 
           className={cn("bg-white", " p-5 h-[calc(100vh-var(--header-height)-40px)]")}
         >
@@ -29,7 +31,7 @@ function ShippingDetails(props: ShippingDetailsProps) {
 
         {data && (
           <Link 
-            href={`/projects/shipping-list/edit/${data._shipping_id}`}
+            href={`/projects/shipping-list/${data._shipping_id}/edit`}
           >
             <Button 
               className={cn(
@@ -64,7 +66,7 @@ function Details({ data }: { data: any }) {
             <AvatarProfile 
               firstname={data.user_firstname}
               lastname={data.user_lastname}
-              photo={data.user_photo}
+              photo={baseUrl + '/users/thumbnail/' + data.user_photo}
               avatarClassName="w-6 h-6"
               avatarColor={data.avatar_color}
               avatarFallbackClassName="font-medium text-white text-xs"
@@ -76,9 +78,7 @@ function Details({ data }: { data: any }) {
 
       <div className="border-2 border-stone-100 p-3 flex justify-between items-center rounded-xl mb-3">
         <p className="text-sm font-medium text-stone-500">Status</p>
-        <div className="bg-green-500 text-white w-fit px-4 py-[2px] rounded-full">
-          {data.shipping_status}
-        </div>
+        <StatusChip status={data.shipping_status} />
       </div>
 
       <Detail>

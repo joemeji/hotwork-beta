@@ -2,7 +2,7 @@ import WarehouseSelect from "@/components/app/warehouse-select"
 import ContactPersonSelect from "./ContactPersonSelect"
 import { memo } from "react"
 
-const Sender = ({ value, onChangeValue, renderContactForm }: SenderProps) => {
+const Sender = ({ value, onChangeValue, renderContactForm, error }: SenderProps) => {
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -12,6 +12,7 @@ const Sender = ({ value, onChangeValue, renderContactForm }: SenderProps) => {
           <WarehouseSelect 
             value={value}
             onChangeValue={onChangeValue}
+            error={error}
           />
         </div>
       </div>
@@ -41,6 +42,7 @@ type SenderProps = {
   value?: any
   onChangeValue?: (value?: any) => void
   renderContactForm?: React.ReactNode
+  error?: any
 }
 
 export default memo(Sender);

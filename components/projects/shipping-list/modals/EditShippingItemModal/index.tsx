@@ -9,8 +9,8 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { cn } from "@/lib/utils";
-import { authHeaders, baseUrl, fetchApi } from "@/utils/api.config";
-import useSWR from 'swr';
+import { fetcher } from "@/utils/api.config";
+import useSWR, { useSWRConfig } from 'swr';
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
 
 function EditShippingItemModal(props: EditShippingItemModalProps) {
@@ -18,7 +18,6 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
     open, 
     onOpenChange,
     item,
-    access_token,
     _shipping_id,
     onUpdated,
   } = props;
@@ -26,21 +25,21 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
   const shippingDetails: any = useContext(ShippingDetailsContext);
   const warehouse_id = shippingDetails ? shippingDetails.warehouse_id : null;
   const currency = shippingDetails ? shippingDetails.currency : null;
+  const { mutate } = useSWRConfig();
 
   const uri = () => {
+    if (!open) return null;
     if (!item) return null;
     if (item.shipping_item_is_set) return null;
-    return `/api/items/${item._item_id}/inventory/${warehouse_id || ''}`;
+    return `/api/item/${item._item_id}/inventory/${warehouse_id || ''}`;
   }
 
-  const { data: inventory, isLoading: inventoryIsLoading, error: inventoryError } = useSWR(
-    [uri(), access_token], 
-    fetchApi,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-    }
-  );
+  const swrOptions = {
+    revalidateOnFocus: false,
+    revalidateIfStale: false,
+  };
+
+  const { data: inventory, isLoading: inventoryIsLoading, error: inventoryError } = useSWR(uri(), fetcher, swrOptions);
 
   let _currentQuantity = inventory ? inventory.current_quantity : 0;
   const _isCustom = item ? (!isNaN(item.is_custom) ? Number(item.is_custom) : 0) : 0;
@@ -105,17 +104,15 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
         shipping_item_id: item.shipping_item_id,
         _item_id: item._item_id || null,
       }
-      const options = {
+      const res = await fetch(`/api/shipping/${_shipping_id}/item/update`, { 
         method: 'POST',
-        headers: { ...authHeaders(access_token) },
-        body: JSON.stringify({ items: [payload] }),
-      };
-      const res = await fetch(baseUrl + `/api/projects/shipping/items/update/${_shipping_id}`, options);
+        body: JSON.stringify({ items: [payload] })
+      });
       const json = await res.json();
-      setIsSubmitting(false);
-      onOpenChange && onOpenChange(false);
       if (json.success && Array.isArray(json.items)) {
-        onUpdated && onUpdated(json.items[0]);
+        mutate(`/api/shipping/${_shipping_id}/items`);
+        setIsSubmitting(false);
+        onOpenChange && onOpenChange(false);
       }
     }
     catch(err: any) {
@@ -161,7 +158,7 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
         open={open} 
         onOpenChange={open => !isSubmitting && onOpenChange && onOpenChange(open)}
       >
-        <DialogContent className="max-w-[600px] p-0 overflow-auto gap-0">
+        <DialogContent forceMount className="max-w-[600px] p-0 overflow-auto gap-0">
           <DialogHeader className="py-2 px-3 flex justify-between flex-row items-center sticky top-0 bg-background z-10">
             <DialogTitle>
               Update Item
@@ -235,7 +232,7 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
                   <div>
                     <div 
                       className={cn(
-                        "bg-stone-100 rounded-xl focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 flex justify-between items-center pe-3",
+                        "bg-stone-100 rounded-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 flex justify-between items-center pe-3",
                         errors && errors.shipping_item_weight && 'ring-2 ring-offset-2 ring-red-300 focus-within:ring-red-300'
                       )}
                     >
@@ -257,7 +254,7 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
                   <>
                     <div 
                       className={cn(
-                        "bg-stone-100 rounded-xl focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 flex justify-between items-center pe-3",
+                        "bg-stone-100 rounded-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 flex justify-between items-center pe-3",
                         errors && errors.shipping_item_unit_value && 'ring-2 ring-offset-2 ring-red-300 focus-within:ring-red-300'
                       )}
                     >
@@ -285,6 +282,7 @@ function EditShippingItemModal(props: EditShippingItemModalProps) {
               </Button>
               <Button type="submit" 
                 disabled={isSubmitting}
+                className={cn(isSubmitting && 'loading')}
               >
                 Update
               </Button>
@@ -302,7 +300,6 @@ type EditShippingItemModalProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   item: any
-  access_token: any
   _shipping_id: any
   onUpdated?: (updatedItem?: any) => void
 }

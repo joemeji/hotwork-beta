@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React, { memo, useContext, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import DeliverTo, { AddressForm, EmployeeForm } from "./DeliverTo";
 import InvoiceTo, { InvoiceEmployeeForm } from "./InvoiceTo";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
@@ -63,6 +63,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
     handleSubmit, 
     formState: { errors }, 
     getValues,
+    setValue,
   } = useForm({
     resolver: yupResolver(yupSchema),
     defaultValues: {
@@ -116,11 +117,32 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
     }
   };
 
+  useEffect(() => {
+    if (shippingDetails) {
+      setValue('shipping_description', shippingDetails.shipping_description);
+      setValue('currency', shippingDetails.shipping_currency);
+      setValue('shipping_delivery_date', shippingDetails.shipping_delivery_date);
+      setValue('shipping_furnace', shippingDetails.shipping_furnace);
+      setValue('shipping_delivery_date', shippingDetails.shipping_delivery_date);
+      setValue('shipping_type_of_unit', shippingDetails.shipping_type_of_unit);
+      setValue('shipping_work', shippingDetails.shipping_work);
+      setValue('shipping_delivery_id', shippingDetails.cms_id);
+      setValue('shipping_delivery_address_id', shippingDetails.cms_address_id);
+      setValue('shipping_delivery_contact_id', shippingDetails.shipping_delivery_contact_id);
+      setValue('shipping_supplier_id', shippingDetails.supplier_cms_id);
+      setValue('shipping_supplier_address_id', shippingDetails.supplier_address_id);
+      setValue('warehouse_id', shippingDetails.warehouse_id);
+      setValue('shipping_sender_contact',shippingDetails.shipping_sender_contact);
+      setValue('shipping_copy_id', shippingDetails.copy_cms_id);
+      setValue('shipping_copy_address_id', shippingDetails.shipping_copy_address_id);
+    }
+  }, [shippingDetails, setValue]);
+
   return (
     <form onSubmit={handleSubmit(onSubmitEditForm)}>
       <div className="flex flex-col p-5 gap-3 w-full mx-auto max-w-[1600px]">
 
-        <div className="flex justify-between bg-background p-3 rounded-xl items-center shadow-sm">
+        <div className="flex justify-between bg-background p-3 rounded-app items-center shadow-sm">
           <h1 className="text-lg font-medium">Edit Shipping</h1>
           <div className="flex items-center gap-1">
             <Button 
@@ -138,7 +160,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
         </div>
 
         <div className="flex gap-3">
-          <div className="w-1/3 bg-background p-6 rounded-xl shadow-sm">
+          <div className="w-1/3 bg-background p-6 rounded-app shadow-sm">
             <Details 
               renderDescription={(
                 <>
@@ -215,7 +237,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
             />
           </div>
 
-          <div className="w-1/3 bg-background p-6 rounded-xl shadow-sm">
+          <div className="w-1/3 bg-background p-6 rounded-app shadow-sm">
             <Controller
               name="shipping_delivery_id"
               control={control}
@@ -253,7 +275,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
               )}
             />
           </div>
-          <div className="w-1/3 bg-background p-6 rounded-xl shadow-sm">
+          <div className="w-1/3 bg-background p-6 rounded-app shadow-sm">
             <Controller 
               name="shipping_supplier_id"
               control={control}
@@ -281,7 +303,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
         </div>
 
         <div className="flex gap-3">
-          <div className="w-1/3 bg-background p-6 rounded-xl shadow-sm">
+          <div className="w-1/3 bg-background p-6 rounded-app shadow-sm">
             <Controller 
               name="warehouse_id"
               control={control}
@@ -305,7 +327,7 @@ function EditShippingDetails(props: EditShippingDetailsModalProps) {
               )}
             />
           </div>
-          <div className="w-1/3 bg-background p-6 rounded-xl shadow-sm">
+          <div className="w-1/3 bg-background p-6 rounded-app shadow-sm">
             <Controller 
               name="shipping_copy_id"
               control={control}

@@ -19,7 +19,7 @@ const CopyTo = ({ onChangeValue, value, renderAddress }: CopyToProps) => {
             <div>
               <p className="mb-1">Company</p>
               <CmsSelect 
-                defaultValue={_shipping_copy_id}
+                shipping_id={shippingDetails && shippingDetails._shipping_id}
                 value={value} 
                 onChangeValue={onChangeValue}
                 />

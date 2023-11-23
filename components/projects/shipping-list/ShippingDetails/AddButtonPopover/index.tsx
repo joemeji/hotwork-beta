@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { memo } from "react";
 
@@ -9,8 +8,8 @@ const AddButtonPopover = (props: AddButtonPopoverProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="shadow-2xl p-3 rounded-full font-medium flex gap-2 items-center">
-          <Plus className="w-[20px] h-[20px]" />
+        <Button className="shadow-2xl py-2.5 px-4 font-medium flex gap-2 items-center">
+          <Plus className="w-[24px] h-[24px]" /> Add Item
         </Button> 
       </PopoverTrigger>
       <PopoverContent className="border-stone-100 py-2 px-0 w-auto">

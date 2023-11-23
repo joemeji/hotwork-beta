@@ -169,4 +169,9 @@
   .truncate {
     @apply whitespace-nowrap overflow-hidden text-ellipsis;
   }
+
+  
+  #html5qr-code-full-region video {
+    @apply !w-full;
+  }
 }

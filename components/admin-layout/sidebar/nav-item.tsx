@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { Url } from "next/dist/shared/lib/router/router";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import * as React from 'react';
 
 const _linkClass = (active: Boolean | undefined) => {
@@ -38,6 +39,12 @@ const NavItem = ({ title, leftIcon, href, active, subs }: NavItemProps) => {
   const onOpenSubMenu = () => {
     setIsOpenSubMenu(!isOpenSubMenu);
   };
+
+  React.useEffect(() => {
+    if (pathName && pathName.includes(href + '/')) {
+      setIsOpenSubMenu(true);
+    }
+  }, [pathName, href]);
 
   React.useEffect(() => {
     if (subs && Array.isArray(subs)) {
@@ -94,7 +101,7 @@ const NavItem = ({ title, leftIcon, href, active, subs }: NavItemProps) => {
                   linkClass, 
                   // 'rounded-none',
                   'hover:bg-stone-900',
-                  pathName === sub.href && 'bg-stone-900'
+                  pathName && pathName.includes(sub.href) && 'bg-stone-900'
                 )}
               >
                 <span className="flex items-center">

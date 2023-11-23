@@ -7,13 +7,14 @@ interface ScrollProps extends React.ComponentPropsWithoutRef<typeof ScrollAreaPr
   onScrollViewport?: (e?: any) => void
   onScrollEndViewPort?: (e?: any) => void
   viewPortClassName?: string
+  viewPortStyle?: React.CSSProperties
 }
 
 import { cn } from "@/lib/utils"
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   ScrollProps
->(({ className, children, onScrollViewport, onScrollEndViewPort, viewPortClassName, ...props }, ref) => {
+>(({ className, children, onScrollViewport, onScrollEndViewPort, viewPortClassName, viewPortStyle, ...props }, ref) => {
 
   const _onScrollViewPort = (e: any) => {
     onScrollViewport && onScrollViewport(e);
@@ -26,9 +27,14 @@ const ScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Root
       ref={ref}
       className={cn("relative overflow-hidden", className)}
+      type="always"
       {...props}
     >
-      <ScrollAreaPrimitive.Viewport onScroll={_onScrollViewPort} className={cn("h-full w-full rounded-[inherit]", viewPortClassName)}>
+      <ScrollAreaPrimitive.Viewport 
+        onScroll={_onScrollViewPort} 
+        className={cn("h-full w-full rounded-[inherit]", viewPortClassName)}
+        style={viewPortStyle}
+      >
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />

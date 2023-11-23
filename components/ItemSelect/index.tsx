@@ -1,4 +1,4 @@
-import { fetchApi } from "@/utils/api.config";
+import { baseUrl, fetchApi } from "@/utils/api.config";
 import { memo, useContext, useEffect, useRef } from "react";
 import { Checkbox } from "../ui/checkbox";
 import useSWRInfinite from "swr/infinite";
@@ -133,6 +133,7 @@ function ItemSelect(props: ItemSelectProps) {
                     item_set_id={item.item_set_id}
                     current_quantity={item.current_quantity}
                     existingEquipmentOnly={existingEquipmentOnly}
+                    item_image={item.item_image}
                   />
                 ))}
                 {Array.isArray(existingEquipments) && existingEquipments.length === 0 && (
@@ -155,6 +156,7 @@ function ItemSelect(props: ItemSelectProps) {
                       item_set_id={item.item_set_id}
                       current_quantity={item.current_quantity}
                       existingEquipmentOnly={existingEquipmentOnly}
+                      item_image={item.item_image}
                     />
                   ));
                 })}
@@ -190,6 +192,7 @@ function SelectedItems(props: SelectedItemsProps) {
           item_name={item.item_name || item.shipping_item_name}
           item_set_id={item.item_set_id}
           active={item.isSelected}
+          item_image={item.item_image}
           shippingCategory={item.shippingCategory}
           onCheckedChange={(isChecked: boolean) => onCheckItem && onCheckItem(isChecked, item)}
           current_quantity={item.current_quantity}
@@ -230,7 +233,8 @@ export function ItemRow(props: ItemRow) {
     item_name,
     item_set_id,
     current_quantity,
-    existingEquipmentOnly
+    existingEquipmentOnly,
+    item_image
   } = props;
 
   const _disabled = () => {
@@ -243,7 +247,7 @@ export function ItemRow(props: ItemRow) {
   return (
     <label htmlFor={_item_id}
       className={cn(
-        "flex justify-between hover:bg-stone-100 px-3 py-2 items-center rounded-xl cursor-pointer",
+        "flex justify-between hover:bg-stone-100 p-1 pe-3 items-center rounded-sm cursor-pointer",
         active && "bg-stone-100",
         _disabled() && 'cursor-default pointer-events-none'
       )}
@@ -251,7 +255,7 @@ export function ItemRow(props: ItemRow) {
       <div className={cn("flex flex-col items-start gap-1", _disabled() && "opacity-50")}>
         {shippingCategory && (
           <div className="flex gap-1 items-center">
-            <span className="text-sm text-stone-500">Categorys</span>
+            <span className="text-sm text-stone-500">Category</span>
             <MoveRight className="text-violet-500 w-5 h-5" />
             <span className="text-stone-500 text-sm">
               {shippingCategory && shippingCategory.shipping_category_name}
@@ -263,7 +267,16 @@ export function ItemRow(props: ItemRow) {
             <div className="w-[15px] h-[15px] bg-purple-300 mt-1 rounded-full" />
           )}
           {!item_set_id && (
-            <div className="w-[15px] h-[15px] bg-red-300 mt-1 rounded-full" />
+            <Image 
+              src={baseUrl + '/equipments/thumbnail/' + item_image}
+              width={50}
+              height={50}
+              className="w-[50px] h-[50px] object-cover rounded-sm"
+              alt={item_name || 'equipment'}
+              onError={(e: any) => {
+                e.target.srcset = `${baseUrl}/equipments/thumbnail/Coming_Soon.jpg`;
+              }}
+            />
           )}
           <div className="flex flex-col gap-1">
             <p className="font-medium">
@@ -275,19 +288,21 @@ export function ItemRow(props: ItemRow) {
             </p>
             <div className="flex gap-2 items-center">
               {!existingEquipmentOnly && (
-                <span className="text-stone-700">
-                  {current_quantity} items
-                </span>
+                <>
+                  <span className="text-stone-700">
+                    {current_quantity} items
+                  </span>
+                  {item_origin && <div className="bg-stone-300 w-1 h-1" />}
+                </>
               )}
-              {item_origin && <div className="bg-stone-300 w-1 h-1" />}
-              <p className="text-stone-700">{item_origin || '-'}</p>
+              <p className="text-stone-700">{item_origin}</p>
             </div>
           </div>
         </div>
       </div>
       <Checkbox 
         id={_item_id} 
-        className="rounded-full h-5 w-5 border-stone-300 bg-stone-300" 
+        className="rounded-full h-5 w-5 border-transparent bg-stone-300" 
         onCheckedChange={onCheckedChange}
         checked={active}
         disabled={_disabled()}
@@ -330,6 +345,7 @@ type ItemRow = {
   item_set_id?: any
   current_quantity?: any
   existingEquipmentOnly?: boolean
+  item_image?: any
 }
 
 type ItemSelectProps = {

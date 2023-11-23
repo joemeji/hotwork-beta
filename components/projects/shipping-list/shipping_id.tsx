@@ -31,13 +31,13 @@ type ShippingDetails = {
 export const CompleteIncompleteStatus = ({ completed = false }: { completed: boolean }) => {
   if (completed) {
     return (
-      <div className="bg-green-400 p-[3px] w-fit rounded-full">
+      <div className="bg-green-700 p-[3px] w-fit rounded-full">
         <Check width={16} height={16} strokeWidth={4} className="text-white" />
       </div> 
     );
   }
   return (
-    <div className="bg-red-400 p-[3px] w-fit rounded-full">
+    <div className="bg-red-700 p-[3px] w-fit rounded-full">
       <X width={16} height={16} strokeWidth={4} className="text-white" />
     </div>
   );

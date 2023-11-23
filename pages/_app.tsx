@@ -4,12 +4,14 @@ import { SessionProvider } from "next-auth/react";
 import NextNProgress from 'nextjs-progressbar';
 import { Toaster } from "@/components/ui/toaster";
 import { argbFromHex, themeFromSourceColor, applyTheme } from "@material/material-color-utilities";
+import { wrapper } from '@/store';
+import { Provider } from 'react-redux';
 
 if (typeof window !== "undefined") {
-  const theme = themeFromSourceColor(argbFromHex('#f82506'), [
+  const theme = themeFromSourceColor(argbFromHex('#000000'), [
     {
       name: "custom-1",
-      value: argbFromHex("#ff0000"),
+      value: argbFromHex("#000000"),
       blend: true,
     },
   ]);
@@ -17,15 +19,21 @@ if (typeof window !== "undefined") {
   applyTheme(theme, {target: document.body, dark: systemDark});
 }
 
-export default function App({ 
+function App({ 
   Component, 
   pageProps : { session, ...pageProps } 
 }: AppProps) {
+  const { store } = wrapper.useWrappedStore(pageProps);
+
   return (
     <SessionProvider session={session}>
-      <NextNProgress color="#dc2626" />
-      <Component {...pageProps} />
-      <Toaster />
+      <Provider store={store}>
+        <NextNProgress color="#18181b" />
+        <Component {...pageProps} />
+        <Toaster />
+      </Provider>
     </SessionProvider>
   );
 }
+
+export default App;

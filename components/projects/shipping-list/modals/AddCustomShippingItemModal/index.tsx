@@ -11,18 +11,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { cn } from "@/lib/utils";
 import { authHeaders, baseUrl } from "@/utils/api.config";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
+import { AccessTokenContext } from "@/context/access-token-context";
+import { useSWRConfig } from "swr";
 
 function AddCustomShippingItemModal(props: AddCustomShippingItemModalProps) {
   const {
     open, 
     onOpenChange,
-    access_token,
     _shipping_id,
     onAdded,
   } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const shippingDetails: any = useContext(ShippingDetailsContext);
   const currency = shippingDetails ? shippingDetails.currency : null;
+  const access_token: any = useContext(AccessTokenContext);
+  const { mutate } = useSWRConfig();
 
   const yupSchema = yup.object({
     shipping_item_name: yup.string().required('Item Name is required'),
@@ -77,6 +80,7 @@ function AddCustomShippingItemModal(props: AddCustomShippingItemModalProps) {
       onOpenChange && onOpenChange(false);
       if (json.success && Array.isArray(json.items)) {
         onAdded && onAdded(json.items[0]);
+        mutate(`/api/shipping/${_shipping_id}/items`);
         setValue('shipping_item_name', '');
         setValue('shipping_item_quantity', 1);
         setValue('shipping_item_weight', 0);
@@ -249,7 +253,6 @@ export default memo(AddCustomShippingItemModal);
 type AddCustomShippingItemModalProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  access_token: any
   _shipping_id: any
   onAdded?: (updatedItem?: any) => void
 }

@@ -3,7 +3,7 @@ import React, { memo, useContext, useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { authHeaders, baseUrl, fetchApi } from "@/utils/api.config";
+import { fetcher } from "@/utils/api.config";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import { beginScrollDataPagerForInfiniteswr } from "@/components/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import SerialStatus from "@/components/status/status";
 import { SN_DAMAGE, SN_ONSHIPPING, SN_ONSOLD, SN_ON_REPAIR, SN_QUARANTINE, snStatuses } from "@/utils/snStatuses";
-import { ShippingDetailsContext } from "@/context/shipping-details-context";
 import LoadingMore from "@/components/LoadingMore";
 
 function AddSerialNumberModal(props: AddSerialNumberModalProps) {
@@ -20,18 +19,16 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
     open, 
     onOpenChange, 
     _item_id, 
-    access_token, 
     needed_quantity, 
     _shipping_id, 
     shipping_item_id, 
-    onAddedSN, 
     addedSerialNumbers, 
     is_item_in_set,
+    onAddedSN,
     item } = props;
   const [checkedItems, setCheckedItems] = useState<any>([]);
   const [openWarningAlert, setOpenWarningAlert] = useState(false);
   const [isSubmitting, setisSubmitting] = useState(false);
-  const shippingDetails: any = useContext(ShippingDetailsContext);
 
   const _is_item_in_set = is_item_in_set || 0;
   const itemProp = item;
@@ -42,12 +39,9 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
       paramsObj['page'] = index + 1;
       if (_shipping_id) paramsObj['_shipping_id'] = _shipping_id;
       let searchParams = new URLSearchParams(paramsObj);
-      return [
-        open ? `${`/api/items/${_item_id}/serial_numbers`}?${searchParams.toString()}` : null, 
-        access_token
-      ];
+      return open ? `${`/api/item/${_item_id}/serial_number/list`}?${searchParams.toString()}` : null;
     }, 
-    fetchApi
+    fetcher
   );
 
   const _data: any = data ? [].concat(...data) : [];
@@ -71,7 +65,7 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
       _checkedItems.push(sn);
     }
 
-    if (_checkedItems.length > Number(needed_quantity)) {
+    if (Array.isArray(_checkedItems) && _checkedItems.filter((item: any) => !item.removed).length > Number(needed_quantity)) {
       _checkedItems.pop();
       setOpenWarningAlert(true);
     }
@@ -107,7 +101,6 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
       const options = {
         method: 'POST',
         body: JSON.stringify({}),
-        headers: { ...authHeaders(access_token) }
       };
       const _checkedItems = [...checkedItems].map((item: any) => {
         const _item: any = {
@@ -128,7 +121,7 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
       });
       options['body'] = JSON.stringify({ serial_numbers: _checkedItems, shipping_item_id });
   
-      const res = await fetch(`${baseUrl}/api/projects/shipping/items/${_shipping_id}/save_serial_numbers/${_item_id}`, options);
+      const res = await fetch(`/api/shipping/${_shipping_id}/serial_number/${_item_id}/save`, options);
       const json = await res.json();
       
       if (json.success) {
@@ -191,7 +184,7 @@ function AddSerialNumberModal(props: AddSerialNumberModalProps) {
               <X />
             </DialogPrimitive.Close>
           </DialogHeader>
-          <ScrollArea className="h-[600px]" onScrollEndViewPort={onscrollend}>
+          <ScrollArea onScrollEndViewPort={onscrollend} viewPortClassName="max-h-[600px]">
             <div className="flex justify-between shadow-sm bg-background/40 backdrop-blur-sm py-2 px-4 sticky top-0 items-center z-10">
               <p>Needed Quantity</p>
               <div className="flex items-center gap-[2px]">
@@ -258,7 +251,6 @@ type AddSerialNumberModalProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   _item_id: string
-  access_token?: string
   needed_quantity?: number
   _shipping_id?: any
   shipping_item_id: any

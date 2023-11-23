@@ -1,7 +1,7 @@
 'use client';
 
 import AdminLayout from "@/components/admin-layout";
-import { ActionButtonHeader, QRCodeModal, TypePlateQRCodeModal, actionMenu, certificationActionButton } from "@/components/items";
+import { actionMenu, certificationActionButton } from "@/components/items";
 import { ItemTabs } from "@/components/items/itemId";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { baseUrl, fetchApi } from "@/utils/api.config";
@@ -23,6 +23,9 @@ import { CodificationTab } from "@/components/items/itemId/CodificationTab";
 import PricesTab from "@/components/items/itemId/PriceTab";
 import { useRouter } from "next/navigation";
 import DocumentTab from "@/components/items/itemId/DocumentTab";
+import QRCodeModal from "@/components/items/modals/QRCodeModal";
+import TypePlateQRCodeModal from "@/components/items/modals/TypePlateQRCodeModal";
+import ActionButtonHeader from "@/components/items/ActionButtonHeader";
 
 export default function ItemId({ _item_id, _item_id_path, access_token, currencies }: any) {
   const [loadingTypePlateButton, setLoadingTypePlateButton] = useState(false);
@@ -85,16 +88,15 @@ export default function ItemId({ _item_id, _item_id_path, access_token, currenci
           qrcodes={qrCodeValues}
           onOpenChange={setOpenQrCodesModal}
           onPrint={() => onViewOnPDF('qr-code', qrCodeValues)}
-          onDownload={() => onViewOnPDF('download:qr-code', qrCodeValues)}
+          onSaveAsPDF={() => onViewOnPDF('download:qr-code', qrCodeValues)}
         />
       )}
       {qrCodeValues.length > 0 && (
-        <TypePlateQRCodeModal 
+        <TypePlateQRCodeModal
           open={openTypePlateQrCodesModal}
           typePlates={qrCodeValues}
           onOpenChange={setOpenTypePlateQrCodesModal}
           onPrint={() => onViewOnPDF('type-plate', qrCodeValues)}
-          onDownload={() => onViewOnPDF('download:type-plate', qrCodeValues)}
         />
       )}
       <div className="w-full max-w-[1600px] mx-auto flex gap-4 min-h-[calc(100vh-var(--header-height))] px-[25px] relative">

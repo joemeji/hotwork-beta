@@ -1,30 +1,28 @@
 import CategorySelect from "@/components/CategorySelect";
 import ItemSelect, { Item } from "@/components/ItemSelect";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { truncate } from "@/utils/text";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Forward, MinusCircle, Search, Trash, X } from "lucide-react";
 import { memo, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { ShippingCategory } from "../AddCategoryModal";
 import SelectShippingCategoryModal from "../SelectShippingCategoryModal";
 import { authHeaders, baseUrl } from "@/utils/api.config";
-import { toast } from "@/components/ui/use-toast";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
+import { useSWRConfig } from "swr";
+import { AccessTokenContext } from "@/context/access-token-context";
 
 function AddEquipmentModal(props: AddEquipmentModalType) {
   const { 
     open, 
     onOpenChange, 
-    access_token, 
     shipping_id, 
     excludedEquipments, 
     itemCategory, 
     existingEquipmentOnly, 
     existingEquipments, 
-    onAddedEquipment,
   } = props;
   const [categoryId, setCategoryId] = useState(null);
   const [subCategoryId, setSubCategoryId] = useState(null);
@@ -38,6 +36,8 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
   const shippingDetails: any = useContext(ShippingDetailsContext);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchInput = searchInputRef.current;
+  const { mutate } = useSWRConfig();
+  const access_token: any = useContext(AccessTokenContext);
 
   const warehouse_id = shippingDetails ? shippingDetails.warehouse_id : null;
 
@@ -127,18 +127,7 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
       const res = await fetch(baseUrl + uri + shipping_id, options);
       const json = await res.json();
       if (json && json.success) {
-        // toast({
-        //   title: "New Equipment Added",
-        //   description: 'Equipment added successfully.',
-        //   variant: 'success',
-        //   duration: 4000
-        // });
-        if (json.items && Array.isArray(json.items)) {
-          onAddedEquipment && onAddedEquipment(json.items);
-        }
-        if (json.items && !Array.isArray(json.items)) {
-          onAddedEquipment && onAddedEquipment([json.items]);
-        }
+        mutate(`/api/shipping/${shipping_id}/items`);
         setTimeout(() => {
           setLoadingSubmit(false);
           onOpenChange && onOpenChange(false);
@@ -148,7 +137,7 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
     catch(err: any) {
       setLoadingSubmit(false);
     } 
-  }, [selectedItems, shipping_id, access_token, onAddedEquipment, existingEquipmentOnly, onOpenChange]);
+  }, [selectedItems, shipping_id, access_token, existingEquipmentOnly, onOpenChange, mutate]);
 
   useEffect(() => {
     if (tab === 'allItems') {
@@ -210,7 +199,7 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
         >
           <div className="min-h-[700px] max-h-[calc(100vh-100px)] flex gap-3">
             {!existingEquipmentOnly && (
-              <ScrollArea className="bg-white rounded-xl"
+              <ScrollArea className="bg-white rounded-sm"
                 style={{
                   width: !existingEquipmentOnly ? '410px' : 0,
                 }}
@@ -226,7 +215,7 @@ function AddEquipmentModal(props: AddEquipmentModalType) {
                 />
               </ScrollArea>
             )}
-            <div className="flex flex-col overflow-hidden bg-white rounded-xl"
+            <div className="flex flex-col overflow-hidden bg-white rounded-sm"
               style={{
                 width: existingEquipmentOnly ? '100%' : 'calc(100% - 410px)',
               }}
@@ -408,11 +397,9 @@ function MenuHeader({ children, className }: { children: React.ReactNode, classN
 type AddEquipmentModalType = {
   open?: boolean
   onOpenChange?: (open?: boolean) => void
-  access_token: string
   shipping_id: any
   excludedEquipments?: any[]
   itemCategory?: any
   existingEquipmentOnly?: boolean
   existingEquipments?: any
-  onAddedEquipment?: ((items: Item[]) => void)
 }

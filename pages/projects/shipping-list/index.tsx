@@ -1,31 +1,25 @@
+import AvatarProfile from "@/components/AvatarProfile";
 import MoreOption from "@/components/MoreOption";
 import AdminLayout from "@/components/admin-layout";
 import { ItemMenu, actionMenu } from "@/components/items";
 import Pagination from "@/components/pagination";
+import StatusChip from "@/components/projects/shipping-list/StatusChip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { addressFormat } from "@/lib/shipping";
 import { cn } from "@/lib/utils";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { fetchApi } from "@/utils/api.config";
+import { baseUrl, fetchApi } from "@/utils/api.config";
 import { avatarFallback } from "@/utils/avatar";
-import { MoreHorizontal } from "lucide-react";
 import { GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from 'swr';
-
-export const statusColor: any = {
-  active: 'bg-green-500',
-  shipped: 'bg-red-500',
-  returned: 'bg-orange-500',
-  closed: 'bg-purple-500',
-};
 
 export default function ShippingList({ access_token }: any) {
   const router = useRouter();
@@ -59,7 +53,7 @@ export default function ShippingList({ access_token }: any) {
   return (
     <AdminLayout>
       <div className="p-[20px] w-full max-w-[1600px] mx-auto">
-        <div className="bg-white w-full rounded-xl shadow-sm">
+        <div className="bg-white w-full rounded-sm shadow-sm">
           <div className="flex justify-between p-4 items-center">
             <p className="text-xl flex font-medium">Shipping List</p>
             <form onSubmit={onSearch}>
@@ -70,7 +64,9 @@ export default function ShippingList({ access_token }: any) {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </form>
-            <Button>New Shipping</Button>
+            <Link href="/projects/shipping-list/create">
+              <Button>New Shipping</Button>
+            </Link>
           </div>
           <table className="w-full">
             <thead className="sticky z-10 top-[var(--header-height)]">
@@ -127,34 +123,44 @@ export default function ShippingList({ access_token }: any) {
                       </span>
                     </Link>
                   </TD>
-                  <TD className="align-top">
+                  <TD className="align-top w-[350px]">
                     <div className="flex flex-col">
                       <span className="font-medium text-sm uppercase">{row.supplier}</span>
-                      <span className="text-sm text-stone-500">{row.supplier_address_building ? row.supplier_address_building + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.supplier_address_street ? row.supplier_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.supplier_address_country ? row.supplier_address_country : ""}</span>
+                      <span className="text-sm text-stone-500">
+                        {addressFormat(
+                          row.supplier_address_building,
+                          row.supplier_address_street,
+                          row.supplier_address_city,
+                          row.supplier_address_country,
+                        )}
+                      </span>
                     </div>
                   </TD>
-                  <TD className="align-top">
+                  <TD className="align-top w-[350px]">
                     <div className="flex flex-col">
                       <span className="font-medium text-sm uppercase">{row.client}</span>
-                      <span className="text-sm text-stone-500">{row.cms_address_building ? row.cms_address_building + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.cms_address_street ? row.cms_address_street + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.cms_address_city ? row.cms_address_city + ", " : ""}</span>
-                      <span className="text-sm text-stone-500">{row.cms_address_country ? row.cms_address_country : ""}</span>
+                      <span className="text-sm text-stone-500">
+                        {addressFormat(
+                          row.cms_address_building,
+                          row.cms_address_street,
+                          row.cms_address_city,
+                          row.cms_address_country,
+                        )}
+                      </span>
                     </div>
                   </TD>
                   <TD className="align-top">
                     <TooltipProvider delayDuration={400}>
                       <Tooltip>
                         <TooltipTrigger>
-                          <Avatar className="w-11 h-11">
-                            <AvatarImage src={row.user_photo} alt={row.user_lastname + ' ' + row.user_lastname} />
-                            <AvatarFallback className="font-medium text-white" style={{ background: row.avatar_color }}>
-                              {avatarFallback(row.user_firstname || 'N', row.user_lastname || 'A')}
-                            </AvatarFallback>
-                          </Avatar>
+                          <AvatarProfile 
+                            firstname={row.user_firstname}
+                            lastname={row.user_lastname}
+                            photo={baseUrl + '/users/thumbnail/' + row.user_photo}
+                            avatarClassName="w-10 h-10"
+                            avatarColor={row.avatar_color}
+                            avatarFallbackClassName="font-medium text-white text-xs"
+                          />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>{(row.user_firstname || 'N') + ' ' + (row.user_lastname || 'A')}</p>
@@ -169,13 +175,7 @@ export default function ShippingList({ access_token }: any) {
                     <span className="text-sm">{row.shipping_delivery_date || '--'}</span>
                   </TD>
                   <TD className="align-top">
-                    <p 
-                      className={cn(
-                        "text-sm text-white flex items-center justify-center font-medium py-0.5 px-1.5 rounded-sm",
-                        statusColor[row.shipping_status]
-                      )}>
-                      {row.shipping_status}
-                    </p>
+                    <StatusChip status={row.shipping_status} />
                   </TD>
                   <TD className="align-top text-right pe-4">
                     <MoreOption>

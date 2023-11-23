@@ -1,7 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
 import React, { memo, useContext, useState } from "react";
-// import CmsSelect from "@/components/CmsSelect";
 import CmsAddressSelect from "./CmsAddressSelect";
 import CmsEmployeeSelect from "@/components/app/cms-employee-select";
 import CmsSelect from "@/components/app/cms-select";
@@ -9,7 +7,7 @@ import CmsSelect from "@/components/app/cms-select";
 const DeliverTo = (props: DeliverToProps) => {
   const shippingDetails: any = useContext(ShippingDetailsContext);
   const _deliver_to_id = shippingDetails ? shippingDetails.cms_id : null;
-  const { onChangeValue, value, renderAddress, renderEmployee } = props;
+  const { onChangeValue, value, renderAddress, renderEmployee, error } = props;
 
   return (
     <React.Fragment>
@@ -20,9 +18,10 @@ const DeliverTo = (props: DeliverToProps) => {
             <div>
               <p className="mb-1">Company</p>
               <CmsSelect 
-                defaultValue={_deliver_to_id}
+                shipping_id={shippingDetails && shippingDetails._shipping_id}
                 value={value} 
                 onChangeValue={onChangeValue}
+                error={error}
               />
             </div>
             <div>
@@ -42,12 +41,13 @@ const DeliverTo = (props: DeliverToProps) => {
 
 export default memo(DeliverTo);
 
-export function AddressForm({ deliver_to_id, onChangeValue, value }: ChildFormProps) {
+export function AddressForm({ deliver_to_id, onChangeValue, value, error }: ChildFormProps) {
   return (
     <CmsAddressSelect 
       cms_id={deliver_to_id}
       value={value}
       onChangeValue={onChangeValue}
+      error={error}
     />
   );
 }
@@ -66,6 +66,7 @@ type ChildFormProps = {
   deliver_to_id?: any
   onChangeValue?: (id?: any) => void
   value?: any
+  error?: any
 }
 
 type DeliverToProps = {
@@ -73,4 +74,5 @@ type DeliverToProps = {
   value?: any
   renderAddress?: React.ReactNode
   renderEmployee?: React.ReactNode
+  error?: any
 }

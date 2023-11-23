@@ -1,20 +1,20 @@
+import ErrorFormMessage from "@/components/app/error-form-message";
 import Combobox from "@/components/ui/combobox";
-import { AccessTokenContext } from "@/context/access-token-context";
-import { fetchApi } from "@/utils/api.config";
-import { memo, useContext, useEffect, useState } from "react";
+import { fetcher } from "@/utils/api.config";
+import { formErrorClassNames } from "@/utils/app";
+import { memo, useEffect, useState } from "react";
 import useSWR from "swr";
 
 const CmsAddressSelect = (props: CmsAddressSelectProps) => {
-  const { cms_id, value, onChangeValue, placeholder } = props;
-  const access_token = useContext(AccessTokenContext);
+  const { cms_id, value, onChangeValue, placeholder, error: formError } = props;
   const [_value, set_value] = useState<any>(null);
+  const [isOpenPopover, setIsOpenPopover] = useState(false);
 
-  const { data, isLoading, error, mutate } = useSWR(() => {
-    return cms_id ? [`/api/cms/cms_address/${cms_id}?${value ? `first=${value}` : ''}`, access_token] : null;
-  }, 
-    fetchApi
+  const { data, isLoading, error, mutate } = useSWR(
+    `/api/cms/${cms_id}/cms_address?${value ? `first=${value}` : ''}`, 
+    fetcher
   );
-  
+
   const cmsAddressTextCity = (cms_address: any) => {
     if (cms_address) {
       const { 
@@ -72,13 +72,22 @@ const CmsAddressSelect = (props: CmsAddressSelectProps) => {
   };
 
   return (
-    <Combobox 
-      value={value}
-      onChangeValue={onChangeValue}
-      contents={contentData()}
-      placeholder={placeholder}
-      isLoading={isLoading}
-    />
+    <div className="flex flex-col gap-1">
+      <Combobox 
+        value={value}
+        onChangeValue={onChangeValue}
+        contents={contentData()}
+        placeholder={placeholder}
+        isLoading={isLoading}
+        className={formError && formErrorClassNames}
+        onOpenChange={open => setIsOpenPopover(open)}
+      />
+      {formError && (
+          <ErrorFormMessage 
+            message={formError.message} 
+          />
+        )}
+    </div>
   );
 };
 
@@ -90,4 +99,5 @@ type CmsAddressSelectProps = {
   value?: any
   onChangeValue?: (value?: any) => void
   placeholder?: any
+  error?: any
 }

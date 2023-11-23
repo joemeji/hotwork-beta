@@ -1,118 +1,87 @@
 import MoreOption from "@/components/MoreOption";
 import { ItemMenu } from "@/components/items";
 import { cn } from "@/lib/utils";
-import { Check, ChevronDown, MinusCircle, Pencil, Trash, X } from "lucide-react";
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, MinusCircle, Pencil, Trash } from "lucide-react";
+import React, { memo, useContext, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
-import { AccessTokenContext } from "@/context/access-token-context";
-import useSWRInfinite from "swr/infinite";
-import { authHeaders, baseUrl, fetchApi } from "@/utils/api.config";
+import { fetcher } from "@/utils/api.config";
 import SetItemList from "./set-item-list";
-import { parsePager } from "@/components/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatter } from "@/utils/text";
 import AddSerialNumberModal from "./modals/AddSerialNumberModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { CompleteIncompleteStatus } from "./shipping_id";
+import useSWR, { useSWRConfig } from "swr";
+import { formatter } from "@/utils/text";
 
 const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
   const { 
     item, 
     onClickEdit, 
-    onOpenSn, 
-    openSn, 
     onClickDelete,
     onClickUncategorized,
-    onCompletedSet,
   } = props;
-  const _open = openSn;
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const scrollArea = scrollAreaRef.current;
   const shippingDetails: any = useContext(ShippingDetailsContext);
-  const access_token: any = useContext(AccessTokenContext);
   const shipping_id = shippingDetails ? shippingDetails._shipping_id : null;
   const [openSNModal, setOpenSNModal] = useState(false);
-  const [newlyAddedSerialNumbers, setNewlyAddedSerialNumbers] = useState<any>([]);
   const [serialNumbersForAddSnModal, setSerialNumbersForAddSnModal] = useState<any>([]);
   const [selectedItemForAddSnModal, setSelectedItemForAddSnModal] = useState<any>(null);
   const shippingData: any = useContext(ShippingDetailsContext);
   const [alertMessage, setAlertMessage] = useState<any>({});
   const [openAlertMessage, setOpenAlertMessage] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
-  const [currPage, setCurrPage] = useState(0);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [totalData, setTotalData] = useState(0);
+  const [openSn, setOpenSn] = useState(false);
+  const { mutate: shippingMutate } = useSWRConfig();
 
   const uri = () => {
     if (!item) return null;
-    if (!open) return null;
-    return `/api/projects/shipping/set/${shipping_id}/items/${item.shipping_item_id}`;
+    if (!openSn) return null;
+    return `/api/shipping/${shipping_id}/set/item/${item.shipping_item_id}`;
   }
   
-  const { data, isLoading, error, size, setSize, isValidating, mutate } = useSWRInfinite(
-    (index) => {
+  const { data, isLoading, error, isValidating, mutate } = useSWR(
+    () => {
       let paramsObj: any = {};
-      paramsObj['page'] = index + 1;
-      let searchParams = new URLSearchParams(paramsObj);
-      return [
-        (_open && item) ? `${uri()}?${searchParams.toString()}` : null, 
-        access_token
-      ];
+      return uri();
     }, 
-    fetchApi
+    fetcher
   );
 
-  const _data: any = useMemo(() => data ? [].concat(...data) : [], [data]);
-  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
-
   const unitValue = (num: number) => {
-    // if (shippingDetails) {
-    //   return formatter(shippingDetails.currency).format(num);
-    // }
+    if (shippingDetails) {
+      return formatter(shippingDetails.currency).format(num);
+    }
     return num;
   };
 
   const onClickAddSN = (_item: any, data: any) => {
-    setNewlyAddedSerialNumbers(data);
     setSelectedItemForAddSnModal(_item);
     setOpenSNModal(true);
   };
 
   const updateSetItem = (set_item: any, removed = false) => {
-    mutate((data) => {
-      const __data: any = data ? [...data] : [];
-      for (let i = 0; i < size; i++) {
-        const _items = __data[i].items || [];
-        const _shipping_set_item_index = _items.findIndex((item: any) => item.sisl_id == set_item.sisl_id);
-        if (_shipping_set_item_index > -1 && !removed) {
-          _items[_shipping_set_item_index] = {...set_item};
-          __data[i].items = _items;
-        }
-        if (_shipping_set_item_index > -1 && removed) {
-          _items.splice(_shipping_set_item_index, 1);
-        }
+    mutate((data: any) => {
+      const _items = data.items || [];
+      const _shipping_set_item_index = _items.findIndex((item: any) => item.sisl_id == set_item.sisl_id);
+      if (_shipping_set_item_index > -1 && !removed) {
+        _items[_shipping_set_item_index] = {...set_item};
+        data.items = _items;
       }
-      return __data;
+      if (_shipping_set_item_index > -1 && removed) {
+        _items.splice(_shipping_set_item_index, 1);
+      }
+      return data;
     });
   };
 
   const onAddedSN = (params: any) => {
-    if (params && !params.shipping_set_item) return;
-    const shipping_set_item = {
-      ...params.shipping_set_item,
-      serial_numbers: params.serial_numbers || [],
-    }
-    if (params.shipping_set_item) {
-      onCompletedSet && onCompletedSet(params.shipping_set_item);
-    }
-    updateSetItem(shipping_set_item);
+    mutate(data);
   };
 
   const onDeletedSN = (shipping_item: any) => {
-    if (shipping_item && shipping_item.sisl_id) updateSetItem(shipping_item);
-    onCompletedSet && onCompletedSet(shipping_item);
+    mutate(data);
+    shippingMutate(`/api/shipping/${shipping_id}/items`);
   };
 
   const onCompleted = async (item: any) => {
@@ -122,16 +91,15 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
         body: JSON.stringify({ 
           shipping_item_id: item.shipping_item_id,
           sisl_id: item.sisl_id,
-        }),
-        headers: { ...authHeaders(access_token) }
+        })
       };
-      const res = await fetch(baseUrl + '/api/projects/shipping/items/' + shipping_id + '/items/complete_unserialized_item', options);
+      const res = await fetch('/api/shipping/' + shipping_id + '/set/item/complete_unserialized_item', options);
       const json = await res.json();
       if (json.success) {
-        updateSetItem(json.shipping_set_item);
+        mutate(data);
       }
       if (json.success && json.shipping_item) {
-        onCompletedSet && onCompletedSet(json.shipping_item);
+        shippingMutate(`/api/shipping/${shipping_id}/items`);
       }
       if (!json.success && json.message) {
         setOpenAlertMessage(true);
@@ -144,6 +112,7 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
   };
 
   const onRemove = async (_item: any, forceDelete = false) => {
+    console.log('sd')
     try {
       const options = {
         method: 'POST',
@@ -151,10 +120,9 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
           sisl_id: _item.sisl_id,
           delete: forceDelete,
         }),
-        headers: { ...authHeaders(access_token) }
       };
       setDeleteItem(_item);
-      const res = await fetch(baseUrl + '/api/projects/shipping/set/delete_item', options);
+      const res = await fetch(`/api/shipping/${shipping_id}/set/item/delete`, options);
       const json = await res.json();
       if (json && json.message) {
         setAlertMessage(json.message);
@@ -165,7 +133,7 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
         setDeleteItem(null);
         setAlertMessage(null);
         setOpenAlertMessage(false);
-        onCompletedSet && onCompletedSet(item, true);
+        shippingMutate(`/api/shipping/${shipping_id}/items`);
 
       }
     }
@@ -178,7 +146,10 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
     if (item && item.set_qty) {
       const total_list_qty = item.set_qty.total_list_qty ? Number(item.set_qty.total_list_qty) : 0;
       const total_details_qty = item.set_qty.total_details_qty ? Number(item.set_qty.total_details_qty) : 0;
-      
+
+      if (total_list_qty === 0 && total_details_qty === 0) {
+        return <CompleteIncompleteStatus completed={false} />;
+      }
       if (total_list_qty === total_details_qty) {
         return <CompleteIncompleteStatus completed={true} />;
       }
@@ -186,38 +157,6 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
     }
     return <CompleteIncompleteStatus completed={false} />;
   };
-
-  // useEffect(() => {
-  //   if (scrollArea) {
-  //     const viewPort: any = scrollArea.querySelector('div[data-radix-scroll-area-viewport]');
-  //     if (viewPort) {
-  //       viewPort.style.maxHeight = '700px';
-  //       viewPort.style.minHeight = '150px';
-  //     }
-  //   }
-  // }, [scrollArea]);
-  
-  useEffect(() => {
-    const onScroll = () => {
-      if (_data && Array.isArray(_data)) {
-        let totalData = 0;
-        _data.forEach((__data: any) => {
-          totalData += Array.isArray(__data.items) ? __data.items.length : 0;
-        });
-        setTotalData(totalData);
-        if (_data[0] && _data[0].total) setTotalRecords(_data[0].total);
-        const lastDataItem: any = _data[_data.length - 1];
-        if (!lastDataItem) return;
-        const pages = parsePager(lastDataItem.pager);
-        const page: any = pages.find((item: any) => item.active);
-        if (!page) return;
-        const lastPage = pages[pages.length - 1];
-        const activePagePage = Number(page.page);
-        setCurrPage(activePagePage);
-      }
-    };
-    onScroll();
-  }, [_data]);
 
   return (
     <>
@@ -255,12 +194,10 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
         onOpenChange={(open: any) => {
           setOpenSNModal(open);
           if (!open) {
-            setNewlyAddedSerialNumbers([]);
             setSerialNumbersForAddSnModal([]);
           }
         }} 
         _item_id={selectedItemForAddSnModal && selectedItemForAddSnModal._item_id}
-        access_token={access_token}
         needed_quantity={
           selectedItemForAddSnModal ? (
             !isNaN(selectedItemForAddSnModal.item_set_list_quantity) ? (
@@ -277,17 +214,17 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
       />
       <div ref={ref}
         className={cn(
-          "overflow-hidden flex flex-col cursor-grab hover:border-stone-100 bg-white rounded-xl border border-transparent",
-          _open && "shadow-sm border-stone-100"
+          "overflow-hidden flex flex-col hover:border-stone-100 rounded-sm",
+          // _open && "shadow-sm border-stone-100"
         )}
       >
         <div className={cn(
             "flex relative py-3 ps-3 pe-2",
-            "border-b-stone-100"
+            "bg-white"
           )}
         >
           <div className="flex items-start">
-            <div className="flex items-start gap-1" style={{ width: '350px' }}>
+            <div className="flex items-start gap-1" style={{ width: '335px' }}>
               <div className="w-[15px] h-[15px] bg-purple-300 mt-1 rounded-full" />
               <div className="flex flex-col px-2">
                 <span className="font-medium" dangerouslySetInnerHTML={{ __html: item.shipping_item_name || '' }} />
@@ -319,7 +256,7 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
                   "hover:bg-stone-100 p-2 rounded-xl",
                 )}
                 tabIndex={-1} 
-                onClick={onOpenSn}
+                onClick={() => setOpenSn(!openSn)}
               >
                 <ChevronDown className={cn("h-5 w-5 transition-all duration-300", openSn && '-rotate-180')} strokeWidth={1} />
               </button>
@@ -344,15 +281,11 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
         </div>
         <ScrollArea 
           ref={scrollAreaRef} 
-          className={cn(
-            "w-full border-t-stone-200",
-            _open && "border-t"
-          )}
-          style={{ height: _open ? 'auto' : 0 }}
+          className={"w-full"}
+          style={{ height: openSn ? 'auto' : 0 }}
         >
-          <div className="flex flex-col gap-1 p-[10px]">
-            {_data && Array.isArray(_data) && _data.map((data: any) => {
-              return data && Array.isArray(data.items) && data.items.map((item: any, key: number) => (
+          <div className="flex flex-col gap-[4px] ps-2 pt-1 ms-[1px] bg-stone-100">
+            {data && Array.isArray(data.items) && data.items.map((item: any, key: number) => (
                 <SetItemList 
                   key={key} 
                   num={key + 1}
@@ -361,23 +294,14 @@ const _ItemList = React.forwardRef((props: ItemListProps, ref: any) => {
                   onDeletedSN={onDeletedSN}
                   onCompleted={() => onCompleted(item)}
                   onRemove={() => onRemove(item, false)}
-                  open={item.open}
                 />
-              ));
-            })}
-            {totalRecords > totalData && (
-              <Button 
-                variant={'ghost'}
-                className={cn(
-                  "py-2 mt-1 rounded-full bg-stone-100 hover:bg-stone-200",
-                  isLoadingMore && 'loading'
-                )}
-                onClick={() => setSize(currPage + 1)}
-              >
-                Load More...
-              </Button>
+            ))}
+            {data && Array.isArray(data.items) && data.items.length === 0 && (
+              <div className="flex justify-center">
+                <span className="font-extrabold text-xl text-stone-400">NO ITEMS FOUND</span>
+              </div>
             )}
-            {isLoadingMore && (
+            {isLoading && (
               <div className="flex flex-col items-center gap-2 pt-4">
                 <Skeleton className="w-[200px] h-[15px]" />
                 <Skeleton className="w-[50px] h-[15px]" />
@@ -399,10 +323,7 @@ type ItemListProps = {
   descriptionWidth?: any
   onOpenModal?: (open: any) => void
   onClickEdit?: () => void
-  onOpenSn?: () => void
-  openSn?: any
   onDeletedSN?: (shipping_item: any) => void
   onClickDelete?: () => void
   onClickUncategorized?: () => void
-  onCompletedSet: (updatedItem: any, isDelete?: boolean) => void
 };

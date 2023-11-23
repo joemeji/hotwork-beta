@@ -1,21 +1,23 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AccessTokenContext } from "@/context/access-token-context";
 import { ShippingDetailsContext } from "@/context/shipping-details-context";
-import { memo, useContext, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ItemSetSelect from "@/components/ItemSetSelect";
 import { authHeaders, baseUrl } from "@/utils/api.config";
 import { cn } from "@/lib/utils";
+import { useSWRConfig } from "swr";
 
 const AddItemSetModal = (props: AddItemSetModal) => {
   const access_token = useContext(AccessTokenContext);
   const shippingDetails: any = useContext(ShippingDetailsContext);
-  const { open, onOpenChange, onAddSet } = props;
+  const { open, onOpenChange } = props;
   const [selectedItems, setSelectedItems] = useState<any>([]);
   const shipping_id = shippingDetails ? shippingDetails._shipping_id: null;
   const [loading, setLoading] = useState(false);
+  const { mutate } = useSWRConfig();
 
   const onSave = async () => {
     try {
@@ -37,7 +39,7 @@ const AddItemSetModal = (props: AddItemSetModal) => {
 
       if (json.success) {
         setLoading(false);
-        onAddSet && onAddSet(json.items);
+        mutate(`/api/shipping/${shipping_id}/items`);
         onOpenChange && onOpenChange(false);
       }
     }
@@ -45,13 +47,16 @@ const AddItemSetModal = (props: AddItemSetModal) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!open) setSelectedItems([]);
+  }, [open]);
   
   return (
     <Dialog 
       open={open} 
       onOpenChange={(open) => {
         onOpenChange && onOpenChange(open);
-        if (!open) setSelectedItems([]);
       }}
     >
       <DialogContent className="max-w-[600px] p-0 overflow-auto gap-0 "
@@ -93,5 +98,4 @@ export default memo(AddItemSetModal);
 type AddItemSetModal = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onAddSet?: (itemSets: any) => void
 }

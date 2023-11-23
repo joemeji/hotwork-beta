@@ -1,30 +1,29 @@
 import AvatarProfile from "@/components/AvatarProfile";
 import { beginScrollDataPagerForInfiniteswr } from "@/components/pagination";
 import Combobox from "@/components/ui/combobox";
-import { AccessTokenContext } from "@/context/access-token-context";
-import { fetchApi } from "@/utils/api.config";
-import { memo, useContext } from "react";
+import { baseUrl, fetcher } from "@/utils/api.config";
+import { memo, useState } from "react";
 import useSWRInfinite from "swr/infinite";
+
+export const contactPersonUri = ({ index, defaultValue }: { index?: any, defaultValue?: any }) => {
+  let paramsObj: any = {};
+  
+
+  paramsObj['page'] = index + 1;
+
+  if (defaultValue) paramsObj['first'] = defaultValue;
+  
+  let searchParams = new URLSearchParams(paramsObj);
+  return `/api/user/company?${searchParams.toString()}`;
+}
 
 const ContactPersonSelect = (props: ContactPersonSelectProps) => {
   const { value, onChangeValue, defaultValue, placeholder } = props;
-  const access_token = useContext(AccessTokenContext);
+  const [isOpenPopover, setIsOpenPopover] = useState(false);
 
   const { data, isLoading, error, size, setSize, isValidating } = useSWRInfinite(
-    (index) => {
-      let paramsObj: any = {};
-
-      paramsObj['page'] = index + 1;
-
-      if (defaultValue) paramsObj['first'] = defaultValue;
-      
-      let searchParams = new URLSearchParams(paramsObj);
-      return [
-        `/api/users/company?${searchParams.toString()}`, 
-        access_token
-      ];
-    }, 
-    fetchApi
+    (index) => contactPersonUri({ index, defaultValue }), 
+    fetcher
   );
 
   const _data: any = data ? [].concat(...data) : [];
@@ -50,8 +49,9 @@ const ContactPersonSelect = (props: ContactPersonSelectProps) => {
                     firstname={user.user_firstname}
                     lastname={user.user_lastname}
                     avatarColor={user.avatar_color}
-                    photo={user.user_photo}
+                    photo={baseUrl + '/users/thumbnail/' + user.user_photo}
                     avatarClassName="text-white font-medium"
+                    avatarImageClassName="object-cover"
                   />
                   <div className="flex flex-col">
                     <span className="font-medium">{user.user_firstname} {user.user_lastname}</span>
@@ -77,6 +77,7 @@ const ContactPersonSelect = (props: ContactPersonSelectProps) => {
         value={value}
         onChangeValue={onChangeValue}
         placeholder={"Contact Person"}
+        onOpenChange={open => setIsOpenPopover(open)}
       />
     </>
   );

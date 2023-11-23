@@ -28,6 +28,30 @@ const nextConfig = {
         pathname: '/ventilator/**',
       },
       {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/compressed_equipments/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/equipments/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/image-preview/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/m/**',
+      },
+      {
         protocol: 'https',
         hostname: 'hotware.blob.core.windows.net',
         port: '',

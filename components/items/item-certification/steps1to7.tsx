@@ -8,7 +8,7 @@ const Step1To7 = React.forwardRef((props: any, ref: any) => {
   const { title, description, images, steps, listDescription } = props;
 
   return (
-    <div className="bg-white flex shadow-sm" ref={ref}>
+    <div className="bg-white flex shadow-sm rounded-xl overflow-hidden" ref={ref}>
       <div className="w-1/2 pe-5 relative flex items-center">
         <span className="border-2 border-green-400 text-green-700 rounded-full py-1.5 px-3 font-medium justify-center flex w-fit absolute top-3 left-3">
           Step {steps}

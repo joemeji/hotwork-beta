@@ -5,7 +5,7 @@ import { Bookmark, Bus, Check, Circle, Loader2, Lock, Recycle, Ship, Wrench, X }
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { ActionButtonHeader, ItemMenu, QRCodeModal, SelectAll, TypePlateQRCodeModal, actionMenu, certificationActionButton, serialNumberAction } from ".";
+import { ItemMenu, SelectAll, actionMenu, certificationActionButton, serialNumberAction } from ".";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
@@ -21,6 +21,9 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import MoreOption from "../MoreOption";
 import Status from "../status/status";
+import QRCodeModal from "./modals/QRCodeModal";
+import TypePlateQRCodeModal from "./modals/TypePlateQRCodeModal";
+import ActionButtonHeader from "./ActionButtonHeader";
 
 type SerialNumbersType = { 
   _item_id?: string, 
@@ -250,7 +253,7 @@ export default function SerialNumbers(props: SerialNumbersType) {
           qrcodes={qrCodeValues}
           onOpenChange={setOpenQrCodesModal}
           onPrint={() => onViewOnPDF('qr-code', qrCodeValues)}
-          onDownload={() => onViewOnPDF('download:qr-code', qrCodeValues)}
+          onSaveAsPDF={() => onViewOnPDF('download:qr-code', qrCodeValues)}
         />
       )}
 
@@ -260,7 +263,6 @@ export default function SerialNumbers(props: SerialNumbersType) {
           typePlates={qrCodeValues}
           onOpenChange={setOpenTypePlateQrCodesModal}
           onPrint={() => onViewOnPDF('type-plate', qrCodeValues)}
-          onDownload={() => onViewOnPDF('download:type-plate', qrCodeValues)}
         />
       )}
 
@@ -304,7 +306,7 @@ export default function SerialNumbers(props: SerialNumbersType) {
         </div>
         <form id="Search" className="max-w-[300px] w-full">
           <Input type="search" placeholder="Search" 
-            className="rounded-xl placeholder:text-stone-400"
+            className="placeholder:text-stone-400"
           />
         </form>
       </div>
@@ -439,7 +441,7 @@ export const ManageSnStatusModal = (props: ManageSnStatusModalType) => {
         onOpenChange && onOpenChange(open);
       }}
     >
-      <DialogContent className="max-w-[500px] p-0 overflow-auto gap-0 ">
+      <DialogContent className="max-w-[500px] p-0 gap-0 ">
         <DialogHeader className="py-2 px-3 flex justify-between flex-row items-center sticky top-0 bg-white">
           <DialogTitle>
             Manage Status

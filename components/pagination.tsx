@@ -13,6 +13,13 @@ function Pagination({ pager, onPaginate }: { pager: string, onPaginate: (page: n
     return <div />;
   }
 
+  const pagePath = () => {
+    if (router.asPath) {
+      return router.asPath.split('?')[0];
+    }
+    return '';
+  }
+
   return (
     <div className="flex justify-center items-center p-3 gap-1">
       {pages.map((item, key) => (
@@ -22,10 +29,10 @@ function Pagination({ pager, onPaginate }: { pager: string, onPaginate: (page: n
             e.preventDefault();
             onPaginate(item.page);
           }} 
-          href={router.asPath + item.query}
+          href={pagePath() + item.query}
           className={cn(
-            "px-3.5 py-1.5 rounded-xl font-medium text-stone-500 bg-stone-100",
-            item.active && 'bg-stone-800 text-stone-200 hover:bg-stone-800 hover:text-stone-200'
+            "px-3.5 py-1.5 rounded-app font-medium text-stone-500 bg-stone-100",
+            item.active && 'bg-stone-950 text-stone-200 hover:bg-stone-800 hover:text-stone-200'
           )}
         >
           {item.label}
@@ -50,10 +57,12 @@ export function parsePager(html: string) {
 
     anchorTags.forEach((elem, index) => {
       if (!elem) return;
-      const li = div.querySelectorAll('li')[index];
 
       const url = new URL(elem.href);
       const params = url.searchParams;
+      
+      const currentSearchParams = new URLSearchParams(location.search);
+      const currentPage = currentSearchParams.get('page') || 1;
 
       let pattern = /[+*\n]|^\d+/g;
       let string = elem.innerText;
@@ -63,7 +72,7 @@ export function parsePager(html: string) {
         query: '?page=' + params.get('page'),
         label: string,
         page: params.get('page'),
-        active: li.classList.contains('active')
+        active: currentPage == params.get('page')
       });
     });
   }

@@ -25,11 +25,12 @@ type ComboboxProps = {
   onScrollEnd?: (ev?: any) => void
   isLoadingMore?: boolean
   onSelectedItem?: (item?: any) => void
+  onOpenChange?: (open: boolean) => void
 }
 
 const Combobox = (props: ComboboxProps) => {
   const [open, setOpen] = useState(false);
-  const { className, placeholder, contents, value, onChangeValue, popOverContentClassName, isLoading, onScrollEnd, isLoadingMore, onSelectedItem } = props;
+  const { className, placeholder, contents, value, onChangeValue, popOverContentClassName, isLoading, onScrollEnd, isLoadingMore, onSelectedItem, onOpenChange } = props;
   const buttonPopOverRef = useRef<HTMLButtonElement>(null);
   const buttonPopOverRefCurrent = buttonPopOverRef.current;
   const [__value, setValue] = useState(value || '');
@@ -63,6 +64,7 @@ const Combobox = (props: ComboboxProps) => {
   return (
     <Popover open={open} onOpenChange={(open) => {
       setOpen(open);
+      onOpenChange && onOpenChange(open);
     }}>
       <PopoverTrigger asChild>
         <Button
@@ -72,7 +74,7 @@ const Combobox = (props: ComboboxProps) => {
           className={cn(
             "bg-stone-100 border-0 w-full h-auto py-3",
             open && "outline-none ring-2 ring-ring ring-offset-2",
-            "justify-between rounded-md font-normal text-left",
+            "justify-between !rounded-app font-normal text-left",
             className
           )}
           ref={buttonPopOverRef}
@@ -86,10 +88,14 @@ const Combobox = (props: ComboboxProps) => {
           <ChevronDown className={`ml-2 h-[${ARROWDOWM_WIDTH}px] w-[${ARROWDOWM_WIDTH}px] shrink-0 opacity-50`} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("w-full p-0 border-stone-100 shadow-[1px_1px_20px_#00000044]", popOverContentClassName)} align="start">
+      <PopoverContent className={cn("w-full p-0 border-stone-00 shadow-sm rounded-app", popOverContentClassName)} align="start">
+        {Array.isArray(contents) && contents.length === 0 && (
+          <div className="py-4 text-center font-medium px-3">List empty</div>
+        )}
+        {!contents && (
+          <div className="py-4 text-center font-medium px-3">List empty</div>
+        )}
         <Command>
-          <CommandInput placeholder={"Search..."} />
-          <CommandEmpty>No found.</CommandEmpty>
           <ScrollArea onScrollEndViewPort={onScrollEnd} className="combobox-selector" style={{ minWidth: buttonWidth() + 'px', maxWidth: '500px' }}>
             <CommandGroup className="p-0">
               {contents && contents.map((item: Content, key: number) => (

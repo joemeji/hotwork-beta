@@ -33,7 +33,7 @@ function ReportForm({ formData, formValues, onChangeFormValues }: any) {
           ref={item.containerRef}  
         >
           <div className="flex gap-2.5 items-center bg-stone-50 p-2">
-            <span className="bg-green-200 w-8 h-8 flex items-center justify-center rounded-full font-medium">
+            <span className="bg-green-500 text-white w-8 h-8 flex items-center justify-center rounded-full font-medium">
               {key1 + 1}
             </span>
             <span className="text-lg font-medium">{item.form_sub_category_name}</span>

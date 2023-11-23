@@ -7,9 +7,11 @@ import { Check, ChevronDown, Pencil, Trash, X } from "lucide-react";
 import React, { memo, useContext, useState } from "react";
 import ShippingItemSerialNumber from "./ShippingItemSerialNumber";
 import { CompleteIncompleteStatus } from "./shipping_id";
+import Image from "next/image";
+import { baseUrl } from "@/utils/api.config";
 
-const SetItemList = ({ item, onClickAddSN, onDeletedSN, onCompleted, onRemove, num, open: _open }: SetItemListProps) => {
-  const [open, setOpen] = useState(_open || false);
+const SetItemList = ({ item, onClickAddSN, onDeletedSN, onCompleted, onRemove, num }: SetItemListProps) => {
+  const [open, setOpen] = useState(false);
   return (
     <ItemList num={num} item={item} onClickOpen={() => setOpen(!open)} open={open} onCompleted={onCompleted} onRemove={onRemove}>
       {item && Number(item.with_serial) === 1 && open && (
@@ -32,7 +34,6 @@ type SetItemListProps = {
   onCompleted?: () => void
   onRemove?: () => void
   num?: number
-  open?: boolean
 }
 
 type ItemListProps = { 
@@ -45,13 +46,13 @@ type ItemListProps = {
   num?: number
 }
 
-const ItemList = ({ item, children, open, onClickOpen, onCompleted, onRemove, num }: ItemListProps) => {
+const ItemList = ({ item, children, open, onClickOpen, onCompleted, onRemove }: ItemListProps) => {
   const shippingDetails: any = useContext(ShippingDetailsContext);
 
   const unitValue = (num: number) => {
-    // if (shippingDetails) {  
-    //   return formatter(shippingDetails.currency).format(num);
-    // }
+    if (shippingDetails) {  
+      return formatter(shippingDetails.currency).format(num);
+    }
     return num;
   };
 
@@ -82,18 +83,27 @@ const ItemList = ({ item, children, open, onClickOpen, onCompleted, onRemove, nu
   return (
     <div
       className={cn(
-        "overflow-hidden flex flex-col cursor-grab bg-white rounded-xl border border-transparent hover:bg-stone-50",
-        open && 'shadow-sm border-stone-100',
+        "overflow-hidden flex flex-col bg-background rounded-sm",
+        // open && 'shadow-sm','
       )}
     >
       <div 
         className={cn(
-          "flex relative py-2 ps-3 pe-2",
-          open && 'border-b border-b-stone-100'
+          "flex relative p-1",
         )}>
-        <div className="flex items-start">
-          <div className="flex items-start gap-1" style={{ width: '332px' }}>
-            <div className="w-[15px] h-[15px] bg-red-300 rounded-full mt-1" />
+        <div className="flex items-center">
+          <div className="flex items-start gap-1" style={{ width: '329px' }}>
+            {/* <div className="w-[15px] h-[15px] bg-red-300 rounded-full mt-1" /> */}
+            <Image
+              alt={item.shipping_item_name || 'Set Item'}
+              width={60}
+              height={60} 
+              className="w-[60px] h-[60px] object-cover rounded-sm"
+              src={baseUrl + '/equipments/thumbnail/' + item.item_image} 
+              onError={(e: any) => {
+                e.target.srcset = `${baseUrl}/equipments/thumbnail/Coming_Soon.jpg`;
+              }}
+            />
             <div className="flex flex-col px-2">
               <span className="font-medium" dangerouslySetInnerHTML={{ __html: item.item_set_name || '' }} />
               <span className="text-stone-500">{item.shipping_item_country_of_origin}</span>
@@ -114,7 +124,7 @@ const ItemList = ({ item, children, open, onClickOpen, onCompleted, onRemove, nu
             <span className="text-sm">{unitValue(item.item_set_unit_value)}</span>
           </div>
         </div>
-        <div className="min-w-[150px] p-2 ps-12">
+        <div className="min-w-[150px] p-2 ps-12 flex items-center">
           {completed()}
         </div>
         <div className="absolute right-0 h-full top-0 flex items-start pe-2 py-3">

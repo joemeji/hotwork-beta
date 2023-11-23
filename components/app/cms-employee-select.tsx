@@ -1,18 +1,14 @@
-import { AccessTokenContext } from "@/context/access-token-context";
 import Combobox from "../ui/combobox";
-import { useContext, useState } from "react";
 import useSWR from "swr";
-import { fetchApi } from "@/utils/api.config";
+import { fetcher } from "@/utils/api.config";
 import AvatarProfile from "../AvatarProfile";
+import { useState } from "react";
 
 const CmsEmployeeSelect = (props: CmsEmployeeSelectProps) => {
   const { value, onChangeValue, placeholder, cms_id } = props;
-  const access_token = useContext(AccessTokenContext);
+  const [isOpenPopover, setIsOpenPopover] = useState(false);
 
-  const { data, isLoading, error, mutate } = useSWR(
-    [`/api/cms/employee/all/${cms_id}`, access_token], 
-    fetchApi
-  );
+  const { data, isLoading, error, mutate } = useSWR(`/api/cms/${cms_id}/cms_employee`, fetcher);
 
   const contentData = () => {
     if (Array.isArray(data) && data.length > 0) {
@@ -46,6 +42,7 @@ const CmsEmployeeSelect = (props: CmsEmployeeSelectProps) => {
       placeholder={placeholder}
       value={value}
       onChangeValue={onChangeValue}
+      onOpenChange={open => setIsOpenPopover(open)}
     />
   );
 };

@@ -20,6 +20,7 @@ module.exports = {
         sidebar: '#000',
       },
       colors: {
+        appRed: "#d30000",
         sidebarLink: '#9ca3af',
         sidebarLinkHover: '#27272a',
         border: "hsl(var(--border))",
@@ -60,6 +61,7 @@ module.exports = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        app: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
         "accordion-down": {

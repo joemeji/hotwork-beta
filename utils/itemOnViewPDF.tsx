@@ -9,7 +9,8 @@ export default function onViewOnPDF(type: string, qrCodeValues: any) {
       doc.save('Qr Codes.pdf');
       return;
     }
-    if (type === 'download:type-plate') {
+
+    if (type === 'download:type-plate:pdf') {
       doc = itemTypePlate({ qrCodeDatas: qrCodeValues });
       doc.save('Type Plates.pdf');
       return;

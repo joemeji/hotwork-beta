@@ -1,5 +1,4 @@
 import { memo, useEffect, useState } from "react";
-import { ItemList, SortableItem } from "./sortable-item";
 import { cn } from "@/lib/utils";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { ChevronDown, Edit, Pencil, Plus, QrCode, Trash } from "lucide-react";
@@ -9,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AddPopOverMenu } from "./ShippingDetails/AddButtonPopover";
+import SortableItem from "./sortable-item";
 
 function CategoryItem(props: CategoryItemProps) {
   const { 
@@ -42,8 +42,8 @@ function CategoryItem(props: CategoryItemProps) {
         >
           <> 
             <div className={cn(
-              "py-4 ps-2 pe-1 cursor-grab flex items-center justify-between relative",
-              (open && item.equipments && item.equipments.length > 0) && 'border-b'
+              "py-4 ps-2 pe-1 flex items-center justify-between relative bg-white rounded-sm",
+              (open && item.equipments && item.equipments.length > 0)
             )}>
               <div className="flex gap-2">
                 <div className="w-[15px] h-[15px] bg-blue-300 rounded-full mt-1" />
@@ -52,15 +52,15 @@ function CategoryItem(props: CategoryItemProps) {
               <div className="flex items-center gap-1 absolute right-0 h-full pe-1">
                 {item.equipments && item.equipments.length > 0 && (
                   <button 
-                    className="hover:bg-stone-100 p-2 rounded-xl"
+                    className="hover:bg-stone-100 p-1 rounded-sm"
                     onClick={onToggleCategoryEquipments}
                   >
                     <ChevronDown className={cn("h-5 w-5 transition-all duration-300", open && '-rotate-180')} strokeWidth={1} />
                   </button>
                 )}
                 <Popover>
-                    <PopoverTrigger className="hover:bg-stone-100 p-2 rounded-xl">
-                      <Plus className={cn("h-5 w-5 transition-all duration-300")} strokeWidth={2} />
+                    <PopoverTrigger className="hover:bg-stone-100 p-1 rounded-sm">
+                      <Plus className={cn("h-5 w-5 transition-all duration-300")} strokeWidth={1} />
                     </PopoverTrigger>
                     <PopoverContent className="border-stone-100 py-2 px-0 w-auto">
                       <div className="flex flex-col">
@@ -71,7 +71,7 @@ function CategoryItem(props: CategoryItemProps) {
                           onClick={onAddNewItem}
                         />
                         <AddPopOverMenu                 
-                          title="Categorized Items"
+                          title="Existing Items"
                           iconColor="text-yellow-500"
                           iconBg="bg-yellow-500/10"
                           onClick={onAddExistingItem}
@@ -92,14 +92,14 @@ function CategoryItem(props: CategoryItemProps) {
               </div>
             </div>
             {item.equipments && item.equipments.length > 0 && (
-              <ScrollArea className="h-0"
+              <ScrollArea className="h-0 border-l"
                 style={{
                   height: open ? '100%' : 0,
-                  paddingTop: !open ? 0 : '8px',
-                  paddingBottom: !open ? 0 : '4px',
+                  // paddingTop: !open ? 0 : '4px',
+                  // paddingBottom: !open ? 0 : '4px',
                 }}
               >
-                <div className="flex flex-col gap-1 ps-3">
+                <div className="flex flex-col gap-1 ps-3 pb-2 pe-2 bg-stone-100 pt-2">
                   {children}
                 </div>
               </ScrollArea>

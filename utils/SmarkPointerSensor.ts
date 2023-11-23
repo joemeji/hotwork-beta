@@ -6,6 +6,7 @@ export default class SmartPointerSensor extends PointerSensor {
       {
           eventName: "onPointerDown" as any,
           handler: ({ nativeEvent: event }: PointerEvent) => {
+            console.log({event});
               if (
                   !event.isPrimary ||
                   event.button !== 0 ||

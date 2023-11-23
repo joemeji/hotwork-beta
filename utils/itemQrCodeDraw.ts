@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import blob2Base64 from "./blob2Base64";
+import qrcode from 'qrcode';
 
 export default function itemQrCodeDraw(qrCodeDatas: any[]) {
   const doc = new jsPDF('l', 'mm', [76.2, 50.8]);
@@ -179,24 +179,9 @@ export function propertyOf(serial_numbers: any[]) {
   return doc;
 }
 
-export async function generateQrCode(data: string) {
-  if (typeof window !== 'undefined') {
-    const QRCodeStyling = require("qr-code-styling");
-    const _qrcodeValue = new QRCodeStyling({
-      width: 300,
-      height: 300,
-      type: "svg", 
-      data,
-      image: "/logos/logo-icon-qrcode.svg",
-      dotsOptions: { type: "rounded" },
-      backgroundOptions: { color: "transparent", },
-      imageOptions: { crossOrigin: "anonymous", }
-    });
-    const blobData = await _qrcodeValue.getRawData();
-    const base64data = await blob2Base64(blobData);
-
-    return base64data;
-  }
-
-  return null;
+export async function generateQrCode(data: string, width?: number) {
+  return await qrcode.toDataURL(data, {
+    width: width || 300,
+    margin: 2
+  });
 }

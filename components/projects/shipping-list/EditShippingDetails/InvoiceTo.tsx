@@ -3,7 +3,7 @@ import React, { memo, useContext, useState } from "react";
 import CmsAddressSelect from "./CmsAddressSelect";
 import CmsSelect from "@/components/app/cms-select";
 
-const InvoiceTo = ({ value, onChangeValue, renderAddress }: InvoiceToProps) => {
+const InvoiceTo = ({ value, onChangeValue, renderAddress, error }: InvoiceToProps) => {
   const shippingDetails: any = useContext(ShippingDetailsContext);
   const _invoice_to_id = shippingDetails ? shippingDetails.supplier_cms_id : null;
 
@@ -16,9 +16,10 @@ const InvoiceTo = ({ value, onChangeValue, renderAddress }: InvoiceToProps) => {
             <div>
               <p className="mb-1">Company</p>
               <CmsSelect 
-                defaultValue={_invoice_to_id}
+                shipping_id={shippingDetails && shippingDetails._shipping_id}
                 value={value} 
                 onChangeValue={onChangeValue}
+                error={error}
               />
             </div>
             <div>
@@ -32,12 +33,13 @@ const InvoiceTo = ({ value, onChangeValue, renderAddress }: InvoiceToProps) => {
   );
 }
 
-export function InvoiceEmployeeForm({ invoice_to_id, onChangeValue, value }: ChildFormProps) {
+export function InvoiceEmployeeForm({ invoice_to_id, onChangeValue, value, error }: ChildFormProps) {
   return (
     <CmsAddressSelect 
       cms_id={invoice_to_id}
       value={value}
       onChangeValue={onChangeValue}
+      error={error}
     />
   );
 }
@@ -48,10 +50,12 @@ type ChildFormProps = {
   invoice_to_id?: any
   onChangeValue?: (id?: any) => void
   value?: any
+  error?: any
 }
 
 type InvoiceToProps = {
   onChangeValue?: (deliver_to_id?: any) => void
   value?: any
   renderAddress?: React.ReactNode
+  error?: any
 }

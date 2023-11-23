@@ -148,7 +148,7 @@ const Protocol = React.forwardRef(({ equipmentDetails, forms, access_token, user
         <div className="flex px-[25px] gap-[25px]">
           <div className="w-[73%] py-4 mx-auto">
             <div className="mb-3">
-              <div className="text-center flex gap-2 justify-between bg-white p-4 shadow-sm items-center">
+              <div className="text-center flex gap-2 justify-between bg-background rounded-xl p-4 shadow-sm items-center">
                 <div className="flex items-center gap-2">
                   <Link href="/items">
                     <Button className="p-2.5" variant="ghost">
@@ -164,7 +164,7 @@ const Protocol = React.forwardRef(({ equipmentDetails, forms, access_token, user
                     onValueChange={(value) => onChangeFormSelect(value)}
                     value={selectedFormId || ''}
                   >
-                    <SelectTrigger className="border w-full border-stone-100 rounded-xl">
+                    <SelectTrigger className="bg-stone-100 border-0 w-full rounded-xl">
                       <SelectValue placeholder="Select forms" className="bg-stone-100" />
                     </SelectTrigger>
                     <SelectContent draggable>
